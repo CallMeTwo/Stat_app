@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 import os
 from dotenv import load_dotenv
 import uuid
@@ -10,6 +11,7 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 import logging
+from pathlib import Path
 
 # Load environment variables
 load_dotenv()
@@ -49,6 +51,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files from frontend build
+static_dir = Path(__file__).parent.parent / "frontend" / "dist"
+if static_dir.exists():
+    # Mount static assets (JS, CSS, images, etc.)
+    app.mount("/assets", StaticFiles(directory=str(static_dir / "assets")), name="assets")
+    logger.info(f"Mounted static files from {static_dir}")
 
 # In-memory storage for uploaded files (in production, use database or file storage)
 uploaded_files = {}
@@ -262,15 +271,22 @@ def perform_distribution_analysis(df, columns):
 
 @app.get("/")
 async def root():
-    """Root endpoint"""
-    return {
-        "message": "Stats React API",
-        "endpoints": {
-            "health": "/api/health",
-            "upload": "/api/upload",
-            "analyze": "/api/analyze",
+    """Serve the frontend application"""
+    static_dir = Path(__file__).parent.parent / "frontend" / "dist"
+    index_file = static_dir / "index.html"
+
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    else:
+        # Fallback to API info if frontend not built
+        return {
+            "message": "Stats React API",
+            "endpoints": {
+                "health": "/api/health",
+                "upload": "/api/upload",
+                "analyze": "/api/analyze",
+            }
         }
-    }
 
 if __name__ == "__main__":
     import uvicorn
