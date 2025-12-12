@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir --prefer-binary -r backend/requirements.txt
 # Copy and install frontend dependencies
 COPY frontend/package*.json ./frontend/
 WORKDIR /app/frontend
-RUN npm ci --only=production
+RUN npm ci
 
 # Copy frontend source and build
 COPY frontend/ ./
