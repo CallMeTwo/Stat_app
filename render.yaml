@@ -1,25 +1,15 @@
 services:
   - type: web
-    name: stats-react-frontend
-    runtime: node
-    buildCommand: cd frontend && npm install && npm run build
-    startCommand: cd frontend && npm run preview
-    staticPublishPath: frontend/dist
+    name: stats-react-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
-      - key: VITE_API_URL
-        scope: build
-        value: ${BACKEND_URL}
-
-  - type: web
-    name: stats-react-backend
-    runtime: python
-    pythonVersion: "3.11"
-    buildCommand: cd backend && pip install --prefer-binary -r requirements.txt && cd ../frontend && npm install && npm run build
-    startCommand: cd backend && uvicorn app:app --host 0.0.0.0 --port $PORT
-    envVars:
+      - key: PORT
+        value: "5000"
       - key: DEBUG
         value: "false"
       - key: ALLOWED_ORIGINS
-        value: ${FRONTEND_URL}
+        value: "*"
       - key: LOG_LEVEL
         value: "INFO"
