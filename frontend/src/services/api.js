@@ -11,8 +11,14 @@ const getBackendURL = () => {
   const protocol = window.location.protocol
   const hostname = window.location.hostname
 
-  // Use the current machine's IP for network access
-  return `${protocol}//${hostname}:5000`
+  // In production (deployed), use the same origin without port
+  // In development (localhost), use port 5000
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('172.')) {
+    return `${protocol}//${hostname}:5000`
+  } else {
+    // Production: same origin (backend serves frontend)
+    return `${protocol}//${hostname}`
+  }
 }
 
 const API_URL = getBackendURL()
