@@ -43,6 +43,13 @@ body {
   flex-wrap: wrap;
   align-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-mode .nav {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-bottom: 2px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .app-title {
@@ -70,6 +77,16 @@ body {
   background-color: white !important;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.dark-mode .theme-toggle {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .theme-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
 }
 
 .nav button:not(.theme-toggle) {
