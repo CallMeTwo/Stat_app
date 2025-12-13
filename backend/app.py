@@ -269,6 +269,28 @@ def perform_distribution_analysis(df, columns):
 
     return results
 
+@app.get("/favicon.svg")
+async def favicon_svg():
+    """Serve the favicon SVG"""
+    static_dir = Path(__file__).parent.parent / "frontend" / "dist"
+    favicon_file = static_dir / "favicon.svg"
+
+    if favicon_file.exists():
+        return FileResponse(str(favicon_file), media_type="image/svg+xml")
+    else:
+        raise HTTPException(status_code=404, detail="Favicon not found")
+
+@app.get("/favicon.ico")
+async def favicon_ico():
+    """Serve favicon.ico (redirect to SVG)"""
+    static_dir = Path(__file__).parent.parent / "frontend" / "dist"
+    favicon_file = static_dir / "favicon.svg"
+
+    if favicon_file.exists():
+        return FileResponse(str(favicon_file), media_type="image/svg+xml")
+    else:
+        raise HTTPException(status_code=404, detail="Favicon not found")
+
 @app.get("/")
 async def root():
     """Serve the frontend application"""
