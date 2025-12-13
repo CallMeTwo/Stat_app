@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import FileUpload from './components/FileUpload'
 import DataDisplay from './components/DataDisplay'
@@ -8,6 +8,19 @@ function App() {
   const [currentPage, setCurrentPage] = useState('upload')
   const [uploadedFile, setUploadedFile] = useState(null)
   const [analysisResults, setAnalysisResults] = useState(null)
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode')
+    return saved ? JSON.parse(saved) : false
+  })
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode))
+    if (darkMode) {
+      document.body.classList.add('dark-mode')
+    } else {
+      document.body.classList.remove('dark-mode')
+    }
+  }, [darkMode])
 
   const handleFileUploaded = (fileData) => {
     setUploadedFile(fileData)
@@ -29,6 +42,13 @@ function App() {
     <div className="app">
       <nav className="nav">
         <span className="app-title">📊 Stats React</span>
+        <button
+          className="theme-toggle"
+          onClick={() => setDarkMode(!darkMode)}
+          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {darkMode ? '☀️' : '🌙'}
+        </button>
         <button
           className={currentPage === 'upload' ? 'active' : ''}
           onClick={() => setCurrentPage('upload')}

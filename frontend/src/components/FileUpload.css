@@ -1,29 +1,31 @@
 .file-upload {
-  background-color: white;
+  background-color: var(--bg-secondary);
   padding: 40px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--shadow);
   max-width: 600px;
   margin: 0 auto;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .file-upload h2 {
   margin-bottom: 10px;
   font-size: 1.8rem;
+  color: var(--text-primary);
 }
 
 .file-upload .description {
-  color: #7f8c8d;
+  color: var(--text-secondary);
   margin-bottom: 30px;
   font-size: 1.05rem;
 }
 
 .upload-area {
-  border: 3px dashed #bdc3c7;
+  border: 3px dashed var(--border-color);
   border-radius: 8px;
   padding: 60px 20px;
   text-align: center;
-  background-color: #f9f9f9;
+  background-color: var(--bg-tertiary);
   transition: all 0.3s ease;
   cursor: pointer;
   margin-bottom: 30px;
@@ -31,12 +33,12 @@
 
 .upload-area:hover {
   border-color: #667eea;
-  background-color: #f0f2f7;
+  background-color: var(--bg-primary);
 }
 
 .upload-area.dragging {
   border-color: #667eea;
-  background-color: #e8ebf7;
+  background-color: var(--bg-primary);
   transform: scale(1.02);
 }
 
@@ -54,7 +56,7 @@
 
 .upload-text {
   font-size: 1rem;
-  color: #2c3e50;
+  color: var(--text-primary);
   margin: 0;
   font-weight: 500;
 }
@@ -95,18 +97,19 @@
 .sample-data-section {
   margin-top: 40px;
   padding-top: 30px;
-  border-top: 2px solid #e0e0e0;
+  border-top: 2px solid var(--border-color);
+  transition: border-color 0.3s ease;
 }
 
 .sample-data-section h3 {
   margin-top: 0;
   margin-bottom: 10px;
-  color: #2c3e50;
+  color: var(--text-primary);
   font-size: 1.4rem;
 }
 
 .sample-data-section > p {
-  color: #7f8c8d;
+  color: var(--text-secondary);
   margin-bottom: 20px;
 }
 
@@ -121,17 +124,17 @@
   align-items: center;
   gap: 15px;
   padding: 20px;
-  background-color: #f8f9fa;
-  border: 2px solid #e0e0e0;
+  background-color: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .sample-card:hover {
   border-color: #667eea;
-  background-color: #f0f2f7;
+  background-color: var(--bg-primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 4px 12px var(--shadow-hover);
 }
 
 .sample-icon {
@@ -145,14 +148,14 @@
 
 .sample-info h4 {
   margin: 0 0 5px 0;
-  color: #2c3e50;
+  color: var(--text-primary);
   font-size: 1.05rem;
   font-weight: 600;
 }
 
 .sample-meta {
   margin: 0;
-  color: #7f8c8d;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
