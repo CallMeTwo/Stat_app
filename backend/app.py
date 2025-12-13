@@ -137,8 +137,12 @@ async def load_sample_data(filename: str):
             'columns': list(df.columns),
         }
 
-        # Prepare preview (first 5 rows)
-        preview_df = df.head(5)
+        # Prepare preview (first 5 and last 5 rows)
+        if len(df) <= 10:
+            preview_df = df
+        else:
+            preview_df = pd.concat([df.head(5), df.tail(5)])
+
         preview = []
         for _, row in preview_df.iterrows():
             row_data = []
@@ -219,8 +223,12 @@ async def upload_file(file: UploadFile = File(...)):
             'columns': list(df.columns),
         }
 
-        # Prepare preview (first 5 rows) - convert to safe JSON-serializable format
-        preview_df = df.head(5)
+        # Prepare preview (first 5 and last 5 rows) - convert to safe JSON-serializable format
+        if len(df) <= 10:
+            preview_df = df
+        else:
+            preview_df = pd.concat([df.head(5), df.tail(5)])
+
         preview = []
         for _, row in preview_df.iterrows():
             row_data = []

@@ -32,11 +32,11 @@
 }
 
 .data-info strong {
-  color: black;
+  color: #667eea;
 }
 
 body.dark-mode .data-info strong {
-  color: white;
+  color: #172E5C;
 }
 
 .columns-list {
