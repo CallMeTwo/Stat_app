@@ -187,9 +187,9 @@ export default function DataSummary({ variableAnalysis, summaryData }) {
               <span className="test-name">Shapiro-Wilk</span>
               {summary.shapiro_stat !== null ? (
                 <div className="test-values">
-                  <span>Statistic: {summary.shapiro_stat.toFixed(2)}</span>
+                  <span>Statistic: {summary.shapiro_stat.toFixed(4)}</span>
                   <span className={summary.shapiro_p < 0.05 ? 'p-significant' : 'p-normal'}>
-                    p-value: {summary.shapiro_p.toFixed(2)}
+                    p-value: {summary.shapiro_p.toFixed(4)}
                   </span>
                 </div>
               ) : (
@@ -200,9 +200,9 @@ export default function DataSummary({ variableAnalysis, summaryData }) {
               <span className="test-name">Jarque-Bera</span>
               {summary.jb_stat !== null ? (
                 <div className="test-values">
-                  <span>Statistic: {summary.jb_stat.toFixed(2)}</span>
+                  <span>Statistic: {summary.jb_stat.toFixed(4)}</span>
                   <span className={summary.jb_p < 0.05 ? 'p-significant' : 'p-normal'}>
-                    p-value: {summary.jb_p.toFixed(2)}
+                    p-value: {summary.jb_p.toFixed(4)}
                   </span>
                 </div>
               ) : (
