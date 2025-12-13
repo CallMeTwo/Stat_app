@@ -140,31 +140,31 @@ export default function DataSummary({ variableAnalysis, summaryData }) {
         <div className="stats-grid">
           <div className="stat-item">
             <span className="stat-label">Mean</span>
-            <span className="stat-value">{summary.mean !== null ? summary.mean.toFixed(4) : 'N/A'}</span>
+            <span className="stat-value">{summary.mean !== null ? summary.mean.toFixed(2) : 'N/A'}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">SD</span>
-            <span className="stat-value">{summary.sd !== null ? summary.sd.toFixed(4) : 'N/A'}</span>
+            <span className="stat-value">{summary.sd !== null ? summary.sd.toFixed(2) : 'N/A'}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">Median</span>
-            <span className="stat-value">{summary.median !== null ? summary.median.toFixed(4) : 'N/A'}</span>
+            <span className="stat-value">{summary.median !== null ? summary.median.toFixed(2) : 'N/A'}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">Q1</span>
-            <span className="stat-value">{summary.q1 !== null ? summary.q1.toFixed(4) : 'N/A'}</span>
+            <span className="stat-value">{summary.q1 !== null ? summary.q1.toFixed(2) : 'N/A'}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">Q3</span>
-            <span className="stat-value">{summary.q3 !== null ? summary.q3.toFixed(4) : 'N/A'}</span>
+            <span className="stat-value">{summary.q3 !== null ? summary.q3.toFixed(2) : 'N/A'}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">Min</span>
-            <span className="stat-value">{summary.min !== null ? summary.min.toFixed(4) : 'N/A'}</span>
+            <span className="stat-value">{summary.min !== null ? summary.min.toFixed(2) : 'N/A'}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">Max</span>
-            <span className="stat-value">{summary.max !== null ? summary.max.toFixed(4) : 'N/A'}</span>
+            <span className="stat-value">{summary.max !== null ? summary.max.toFixed(2) : 'N/A'}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">Missingness</span>
@@ -172,11 +172,11 @@ export default function DataSummary({ variableAnalysis, summaryData }) {
           </div>
           <div className="stat-item">
             <span className="stat-label">Kurtosis</span>
-            <span className="stat-value">{summary.kurtosis !== null ? summary.kurtosis.toFixed(4) : 'N/A'}</span>
+            <span className="stat-value">{summary.kurtosis !== null ? summary.kurtosis.toFixed(2) : 'N/A'}</span>
           </div>
           <div className="stat-item">
             <span className="stat-label">Skewness</span>
-            <span className="stat-value">{summary.skewness !== null ? summary.skewness.toFixed(4) : 'N/A'}</span>
+            <span className="stat-value">{summary.skewness !== null ? summary.skewness.toFixed(2) : 'N/A'}</span>
           </div>
         </div>
 
@@ -187,9 +187,9 @@ export default function DataSummary({ variableAnalysis, summaryData }) {
               <span className="test-name">Shapiro-Wilk</span>
               {summary.shapiro_stat !== null ? (
                 <div className="test-values">
-                  <span>Statistic: {summary.shapiro_stat.toFixed(4)}</span>
+                  <span>Statistic: {summary.shapiro_stat.toFixed(2)}</span>
                   <span className={summary.shapiro_p < 0.05 ? 'p-significant' : 'p-normal'}>
-                    p-value: {summary.shapiro_p.toFixed(4)}
+                    p-value: {summary.shapiro_p.toFixed(2)}
                   </span>
                 </div>
               ) : (
@@ -200,9 +200,9 @@ export default function DataSummary({ variableAnalysis, summaryData }) {
               <span className="test-name">Jarque-Bera</span>
               {summary.jb_stat !== null ? (
                 <div className="test-values">
-                  <span>Statistic: {summary.jb_stat.toFixed(4)}</span>
+                  <span>Statistic: {summary.jb_stat.toFixed(2)}</span>
                   <span className={summary.jb_p < 0.05 ? 'p-significant' : 'p-normal'}>
-                    p-value: {summary.jb_p.toFixed(4)}
+                    p-value: {summary.jb_p.toFixed(2)}
                   </span>
                 </div>
               ) : (
