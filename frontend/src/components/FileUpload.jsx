@@ -101,65 +101,70 @@ export default function FileUpload({ onFileUploaded }) {
   return (
     <div className="file-upload">
       <h2>Upload Your Data</h2>
-      <p className="description">
-        Upload a CSV or Excel file to get started with statistical analysis
-      </p>
 
-      <div
-        className={`upload-area ${isDragging ? 'dragging' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        <div className="upload-content">
-          <p className="upload-icon">📁</p>
-          <p className="upload-text">
-            {isLoading ? 'Uploading...' : 'Drag and drop your file here, or click to select'}
+      <div className="upload-layout">
+        <div className="upload-section">
+          <p className="description">
+            Upload a CSV or Excel file to get started with statistical analysis
           </p>
-          <input
-            type="file"
-            id="file-input"
-            accept=".csv,.xlsx,.xls"
-            onChange={handleFileInput}
-            disabled={isLoading}
-            style={{ display: 'none' }}
-          />
-          <label htmlFor="file-input" className="upload-button">
-            {isLoading ? 'Uploading...' : 'Select File'}
-          </label>
-        </div>
-      </div>
 
-      {error && <div className="error">{error}</div>}
-
-      {sampleFiles.length > 0 && (
-        <div className="sample-data-section">
-          <h3>Or Try Sample Data</h3>
-          <p>Don't have data? Test the app with these sample datasets:</p>
-          <div className="sample-cards">
-            {sampleFiles.map((sample) => (
-              <div key={sample.filename} className="sample-card">
-                <div className="sample-icon">
-                  {sample.type === 'CSV' ? '📄' : '📊'}
-                </div>
-                <div className="sample-info">
-                  <h4>{sample.filename}</h4>
-                  <p className="sample-meta">
-                    {sample.type} • {(sample.size / 1024).toFixed(1)} KB
-                  </p>
-                </div>
-                <button
-                  className="load-sample-btn"
-                  onClick={() => handleLoadSample(sample.filename)}
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Loading...' : 'Load'}
-                </button>
-              </div>
-            ))}
+          <div
+            className={`upload-area ${isDragging ? 'dragging' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <div className="upload-content">
+              <p className="upload-icon">📁</p>
+              <p className="upload-text">
+                {isLoading ? 'Uploading...' : 'Drag and drop your file here, or click to select'}
+              </p>
+              <input
+                type="file"
+                id="file-input"
+                accept=".csv,.xlsx,.xls"
+                onChange={handleFileInput}
+                disabled={isLoading}
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="file-input" className="upload-button">
+                {isLoading ? 'Uploading...' : 'Select File'}
+              </label>
+            </div>
           </div>
+
+          {error && <div className="error">{error}</div>}
         </div>
-      )}
+
+        {sampleFiles.length > 0 && (
+          <div className="sample-data-section">
+            <h3>Or Try Sample Data</h3>
+            <p>Don't have data? Test the app with these sample datasets:</p>
+            <div className="sample-cards">
+              {sampleFiles.map((sample) => (
+                <div key={sample.filename} className="sample-card">
+                  <div className="sample-icon">
+                    {sample.type === 'CSV' ? '📄' : '📊'}
+                  </div>
+                  <div className="sample-info">
+                    <h4>{sample.filename}</h4>
+                    <p className="sample-meta">
+                      {sample.type} • {(sample.size / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
+                  <button
+                    className="load-sample-btn"
+                    onClick={() => handleLoadSample(sample.filename)}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Loading...' : 'Load'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
