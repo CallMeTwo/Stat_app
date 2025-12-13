@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import api from '../services/api'
 import './FileUpload.css'
 
@@ -6,6 +6,7 @@ export default function FileUpload({ onFileUploaded }) {
   const [isDragging, setIsDragging] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [sampleFiles, setSampleFiles] = useState([])
 
   const handleDragOver = (e) => {
     e.preventDefault()
@@ -69,6 +70,34 @@ export default function FileUpload({ onFileUploaded }) {
     }
   }
 
+  const handleLoadSample = async (filename) => {
+    setError(null)
+    setIsLoading(true)
+
+    try {
+      const response = await api.post(`/api/load-sample/${filename}`)
+      onFileUploaded(response.data)
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to load sample data')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    // Fetch available sample files
+    const fetchSampleFiles = async () => {
+      try {
+        const response = await api.get('/api/sample-data')
+        setSampleFiles(response.data.samples || [])
+      } catch (err) {
+        console.error('Failed to fetch sample files:', err)
+      }
+    }
+
+    fetchSampleFiles()
+  }, [])
+
   return (
     <div className="file-upload">
       <h2>Upload Your Data</h2>
@@ -103,17 +132,34 @@ export default function FileUpload({ onFileUploaded }) {
 
       {error && <div className="error">{error}</div>}
 
-      <div className="sample-data-info">
-        <h3>Sample Data Available</h3>
-        <p>Test the app with these sample datasets:</p>
-        <ul>
-          <li><strong>small_dataset.csv</strong> - Small health metrics dataset (325 bytes)</li>
-          <li><strong>large_dataset.xlsx</strong> - Larger dataset for comprehensive testing (113 KB)</li>
-        </ul>
-        <p className="hint">
-          💡 These files are in the <code>sample_data/</code> folder for testing purposes.
-        </p>
-      </div>
+      {sampleFiles.length > 0 && (
+        <div className="sample-data-section">
+          <h3>Or Try Sample Data</h3>
+          <p>Don't have data? Test the app with these sample datasets:</p>
+          <div className="sample-cards">
+            {sampleFiles.map((sample) => (
+              <div key={sample.filename} className="sample-card">
+                <div className="sample-icon">
+                  {sample.type === 'CSV' ? '📄' : '📊'}
+                </div>
+                <div className="sample-info">
+                  <h4>{sample.filename}</h4>
+                  <p className="sample-meta">
+                    {sample.type} • {(sample.size / 1024).toFixed(1)} KB
+                  </p>
+                </div>
+                <button
+                  className="load-sample-btn"
+                  onClick={() => handleLoadSample(sample.filename)}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Loading...' : 'Load'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

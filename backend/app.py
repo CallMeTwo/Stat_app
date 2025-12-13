@@ -67,6 +67,114 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "ok", "service": "Stats React API"}
 
+@app.get("/api/sample-data")
+async def list_sample_data():
+    """List available sample datasets"""
+    sample_dir = Path(__file__).parent.parent / "sample_data"
+
+    if not sample_dir.exists():
+        return {"samples": []}
+
+    samples = []
+    for file_path in sample_dir.glob("*"):
+        if file_path.suffix.lower() in ['.csv', '.xlsx', '.xls']:
+            samples.append({
+                "filename": file_path.name,
+                "size": file_path.stat().st_size,
+                "type": "CSV" if file_path.suffix.lower() == '.csv' else "Excel"
+            })
+
+    return {"samples": samples}
+
+@app.post("/api/load-sample/{filename}")
+async def load_sample_data(filename: str):
+    """Load a sample dataset"""
+    sample_dir = Path(__file__).parent.parent / "sample_data"
+    file_path = sample_dir / filename
+
+    # Security: prevent directory traversal
+    if not file_path.resolve().is_relative_to(sample_dir.resolve()):
+        raise HTTPException(status_code=400, detail="Invalid filename")
+
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Sample file not found")
+
+    if file_path.suffix.lower() not in ['.csv', '.xlsx', '.xls']:
+        raise HTTPException(status_code=400, detail="Invalid file type")
+
+    try:
+        # Read the file
+        with open(file_path, 'rb') as f:
+            contents = f.read()
+
+        file_obj = io.BytesIO(contents)
+
+        # Load dataframe based on file type
+        if filename.endswith('.csv'):
+            df = pd.read_csv(file_obj)
+        else:
+            df = pd.read_excel(file_obj)
+
+        # Validate dataframe
+        if df.empty:
+            raise HTTPException(status_code=400, detail="File is empty")
+
+        if len(df.columns) == 0:
+            raise HTTPException(status_code=400, detail="File has no columns")
+
+        # Replace NaN and Inf values for JSON serialization
+        df = df.replace([np.inf, -np.inf], np.nan)
+        df = df.where(pd.notna(df), None)
+
+        # Generate file ID
+        file_id = str(uuid.uuid4())
+
+        # Store file info
+        uploaded_files[file_id] = {
+            'dataframe': df,
+            'filename': filename,
+            'rows': len(df),
+            'columns': list(df.columns),
+        }
+
+        # Prepare preview (first 5 rows)
+        preview_df = df.head(5)
+        preview = []
+        for _, row in preview_df.iterrows():
+            row_data = []
+            for val in row:
+                if pd.isna(val):
+                    row_data.append(None)
+                elif isinstance(val, (float, np.floating)):
+                    if np.isinf(val):
+                        row_data.append(None)
+                    else:
+                        row_data.append(round(val, 4))
+                elif isinstance(val, (int, np.integer)):
+                    row_data.append(int(val))
+                else:
+                    row_data.append(str(val))
+            preview.append(row_data)
+
+        logger.info(f"Sample data loaded: {filename} ({file_id})")
+
+        return {
+            "file_id": file_id,
+            "filename": filename,
+            "rows": len(df),
+            "columns": list(df.columns),
+            "preview": preview,
+            "dtypes": {col: str(df[col].dtype) for col in df.columns}
+        }
+
+    except pd.errors.EmptyDataError:
+        raise HTTPException(status_code=400, detail="File is empty")
+    except pd.errors.ParserError:
+        raise HTTPException(status_code=400, detail="Invalid file format")
+    except Exception as e:
+        logger.error(f"Error loading sample data: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Error processing file: {str(e)}")
+
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
     """Upload a CSV or Excel file for analysis"""
