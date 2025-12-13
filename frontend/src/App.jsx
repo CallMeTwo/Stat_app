@@ -4,6 +4,7 @@ import FileUpload from './components/FileUpload'
 import DataDisplay from './components/DataDisplay'
 import DataTypeValidation from './components/DataTypeValidation'
 import DataSummary from './components/DataSummary'
+import Visualization from './components/Visualization'
 import AnalysisPanel from './components/AnalysisPanel'
 import api from './services/api'
 
@@ -135,6 +136,12 @@ function App() {
               Data Summary
             </button>
             <button
+              className={currentPage === 'visualization' ? 'active' : ''}
+              onClick={() => setCurrentPage('visualization')}
+            >
+              Visualization
+            </button>
+            <button
               className={currentPage === 'analysis' ? 'active' : ''}
               onClick={() => setCurrentPage('analysis')}
             >
@@ -174,6 +181,12 @@ function App() {
           <DataSummary
             variableAnalysis={variableAnalysis}
             summaryData={summaryData}
+          />
+        )}
+        {currentPage === 'visualization' && uploadedFile && variableAnalysis && (
+          <Visualization
+            fileId={uploadedFile.file_id}
+            variableAnalysis={variableAnalysis}
           />
         )}
         {currentPage === 'analysis' && uploadedFile && (
