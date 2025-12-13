@@ -116,10 +116,12 @@ body.dark-mode .theme-toggle:hover {
 
 .main-content {
   flex: 1;
+  background-color: var(--bg-primary);
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  transition: background-color 0.3s ease;
 }
 
 .results-container {
