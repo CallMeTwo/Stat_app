@@ -1,8 +1,16 @@
 import './DataDisplay.css'
 
-export default function DataDisplay({ data }) {
+export default function DataDisplay({ data, variableAnalysis }) {
   if (!data || !data.preview) {
     return <div className="data-display">No data available</div>
+  }
+
+  // Create a map of column names to their types
+  const columnTypeMap = {}
+  if (variableAnalysis) {
+    variableAnalysis.forEach(v => {
+      columnTypeMap[v.name] = v.currentType || v.detected_type
+    })
   }
 
   // Prepare preview rows: first 5 and last 5
@@ -26,10 +34,19 @@ export default function DataDisplay({ data }) {
       <div className="columns-list">
         <h3>Column Names:</h3>
         <ol className="column-names">
-          {data.columns?.map((col, idx) => (
-            <li key={idx}>{col}</li>
-          ))}
+          {data.columns?.map((col, idx) => {
+            const varType = columnTypeMap[col] || 'text'
+            return (
+              <li key={idx} className={`type-${varType}`}>{col}</li>
+            )
+          })}
         </ol>
+        <div className="type-legend">
+          <span className="legend-item type-numeric">Numeric</span>
+          <span className="legend-item type-categorical">Categorical</span>
+          <span className="legend-item type-date">Date</span>
+          <span className="legend-item type-text">Text</span>
+        </div>
       </div>
 
       {showSeparateTables ? (

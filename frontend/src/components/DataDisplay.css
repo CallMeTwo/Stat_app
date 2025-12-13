@@ -100,6 +100,103 @@ body.dark-mode .column-names li::before {
   background-color: var(--bg-tertiary);
 }
 
+/* Type-specific background colors */
+.column-names li.type-numeric {
+  background-color: rgba(52, 152, 219, 0.3);
+  border-color: rgba(52, 152, 219, 0.6);
+}
+
+.column-names li.type-categorical {
+  background-color: rgba(155, 89, 182, 0.3);
+  border-color: rgba(155, 89, 182, 0.6);
+}
+
+.column-names li.type-date {
+  background-color: rgba(46, 204, 113, 0.3);
+  border-color: rgba(46, 204, 113, 0.6);
+}
+
+.column-names li.type-text {
+  background-color: rgba(241, 196, 15, 0.3);
+  border-color: rgba(241, 196, 15, 0.6);
+}
+
+body.dark-mode .column-names li.type-numeric {
+  background-color: rgba(52, 152, 219, 0.2);
+  border-color: rgba(52, 152, 219, 0.5);
+}
+
+body.dark-mode .column-names li.type-categorical {
+  background-color: rgba(155, 89, 182, 0.2);
+  border-color: rgba(155, 89, 182, 0.5);
+}
+
+body.dark-mode .column-names li.type-date {
+  background-color: rgba(46, 204, 113, 0.2);
+  border-color: rgba(46, 204, 113, 0.5);
+}
+
+body.dark-mode .column-names li.type-text {
+  background-color: rgba(241, 196, 15, 0.2);
+  border-color: rgba(241, 196, 15, 0.5);
+}
+
+.type-legend {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  border: 1px solid;
+  color: var(--text-primary);
+}
+
+.legend-item.type-numeric {
+  background-color: rgba(52, 152, 219, 0.3);
+  border-color: rgba(52, 152, 219, 0.6);
+}
+
+.legend-item.type-categorical {
+  background-color: rgba(155, 89, 182, 0.3);
+  border-color: rgba(155, 89, 182, 0.6);
+}
+
+.legend-item.type-date {
+  background-color: rgba(46, 204, 113, 0.3);
+  border-color: rgba(46, 204, 113, 0.6);
+}
+
+.legend-item.type-text {
+  background-color: rgba(241, 196, 15, 0.3);
+  border-color: rgba(241, 196, 15, 0.6);
+}
+
+body.dark-mode .legend-item.type-numeric {
+  background-color: rgba(52, 152, 219, 0.2);
+  border-color: rgba(52, 152, 219, 0.5);
+}
+
+body.dark-mode .legend-item.type-categorical {
+  background-color: rgba(155, 89, 182, 0.2);
+  border-color: rgba(155, 89, 182, 0.5);
+}
+
+body.dark-mode .legend-item.type-date {
+  background-color: rgba(46, 204, 113, 0.2);
+  border-color: rgba(46, 204, 113, 0.5);
+}
+
+body.dark-mode .legend-item.type-text {
+  background-color: rgba(241, 196, 15, 0.2);
+  border-color: rgba(241, 196, 15, 0.5);
+}
+
 .table-section {
   margin-bottom: 30px;
 }
@@ -151,7 +248,7 @@ body.dark-mode .data-table thead {
 }
 
 .data-table th {
-  padding: 15px;
+  padding: 8px 12px;
   text-align: left;
   font-weight: 600;
   white-space: nowrap;
@@ -159,7 +256,7 @@ body.dark-mode .data-table thead {
 }
 
 .data-table td {
-  padding: 12px 15px;
+  padding: 6px 12px;
   border: 1px solid var(--border-color);
   text-align: left;
   color: var(--text-primary);
