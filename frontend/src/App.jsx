@@ -27,12 +27,8 @@ function App() {
 
   return (
     <div className="app">
-      <header className="header">
-        <h1>📊 Stats React</h1>
-        <p>Statistical Analysis Tool</p>
-      </header>
-
       <nav className="nav">
+        <span className="app-title">📊 Stats React</span>
         <button
           className={currentPage === 'upload' ? 'active' : ''}
           onClick={() => setCurrentPage('upload')}

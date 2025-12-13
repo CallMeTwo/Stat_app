@@ -4,69 +4,62 @@
   min-height: 100vh;
 }
 
-.header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 40px 20px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  color: white;
-}
-
-.header p {
-  font-size: 1.1rem;
-  opacity: 0.9;
-}
-
 .nav {
   display: flex;
   gap: 10px;
-  padding: 20px;
-  background-color: white;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: 2px solid #5568d3;
   flex-wrap: wrap;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.app-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: white;
+  margin-right: 20px;
+  white-space: nowrap;
 }
 
 .nav button {
-  background-color: #ecf0f1;
-  color: #2c3e50;
-  padding: 10px 20px;
-  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #5568d3;
+  padding: 8px 16px;
+  border-radius: 6px;
   border: 2px solid transparent;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.3s ease;
+  font-size: 0.9rem;
 }
 
 .nav button:hover {
-  background-color: #d5dbdb;
+  background-color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .nav button.active {
-  background-color: #667eea;
-  color: white;
-  border-color: #667eea;
+  background-color: white;
+  color: #667eea;
+  border-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .nav button.reset {
   margin-left: auto;
-  background-color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.9);
   color: white;
 }
 
 .nav button.reset:hover {
-  background-color: #c0392b;
+  background-color: #e74c3c;
 }
 
 .main-content {
   flex: 1;
-  padding: 40px 20px;
+  padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -93,34 +86,32 @@
   background-color: #2c3e50;
   color: white;
   text-align: center;
-  padding: 20px;
-  margin-top: 40px;
+  padding: 12px;
+  margin-top: 20px;
+  font-size: 0.85rem;
 }
 
 .footer p {
   margin: 0;
+  opacity: 0.8;
 }
 
 @media (max-width: 768px) {
-  .header h1 {
-    font-size: 1.8rem;
-  }
-
-  .header p {
-    font-size: 0.95rem;
-  }
-
   .nav {
-    flex-direction: column;
-    gap: 8px;
+    padding: 12px 15px;
   }
 
-  .nav button.reset {
-    margin-left: 0;
-    width: 100%;
+  .app-title {
+    font-size: 1rem;
+    margin-right: 10px;
+  }
+
+  .nav button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
   }
 
   .main-content {
-    padding: 20px 10px;
+    padding: 15px 10px;
   }
 }
