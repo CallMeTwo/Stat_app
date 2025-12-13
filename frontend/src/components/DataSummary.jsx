@@ -1,111 +1,111 @@
 import { useState, useEffect, useMemo } from 'react'
 import './DataSummary.css'
-import api from '../services/api'
 
-export default function DataSummary({ fileId, variableAnalysis }) {
-  const [summaryData, setSummaryData] = useState({})
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [loadingVars, setLoadingVars] = useState({}) // Track which variables are loading
+export default function DataSummary({ variableAnalysis, summaryData }) {
   const [dateRounding, setDateRounding] = useState({})
-  const [textSeeds, setTextSeeds] = useState({}) // Per-variable seeds
+  const [textSampleKeys, setTextSampleKeys] = useState({}) // Trigger re-sampling
   const [sortConfig, setSortConfig] = useState({})
   const [expandedVars, setExpandedVars] = useState({}) // Track which cards are expanded
 
-  // Initial load: fetch all summaries at once
+  // Initialize state when component mounts or variableAnalysis changes
   useEffect(() => {
-    if (!fileId || !variableAnalysis || variableAnalysis.length === 0) {
-      setLoading(false)
-      return
-    }
+    if (!variableAnalysis || variableAnalysis.length === 0) return
 
-    fetchAllSummaries()
-  }, [fileId, variableAnalysis])
+    // Initialize default date rounding and sample keys
+    const initialRounding = {}
+    const initialSampleKeys = {}
+    const initialExpanded = {}
 
-  const fetchAllSummaries = async () => {
-    try {
-      setLoading(true)
-      setError(null)
+    variableAnalysis.forEach(v => {
+      if (v.currentType === 'date') {
+        initialRounding[v.name] = 'year' // Default to year
+      }
+      if (v.currentType === 'text') {
+        initialSampleKeys[v.name] = 0 // Initial sample key
+      }
+      initialExpanded[v.name] = true // All cards expanded by default
+    })
 
-      // Initialize seeds for text variables and default date rounding
-      const initialSeeds = {}
-      const initialRounding = {}
-      const initialExpanded = {}
+    setDateRounding(initialRounding)
+    setTextSampleKeys(initialSampleKeys)
+    setExpandedVars(initialExpanded)
+  }, [variableAnalysis])
 
-      variableAnalysis.forEach(v => {
-        if (v.currentType === 'text') {
-          initialSeeds[v.name] = 42
-        }
-        if (v.currentType === 'date') {
-          initialRounding[v.name] = 'year' // Default to year
-        }
-        initialExpanded[v.name] = true // All cards expanded by default
-      })
-
-      setTextSeeds(initialSeeds)
-      setDateRounding(initialRounding)
-      setExpandedVars(initialExpanded)
-
-      const response = await api.post(`/api/summary-statistics/${fileId}`, {
-        variables: variableAnalysis,
-        dateRounding: initialRounding,
-        textSeed: 42
-      })
-
-      setSummaryData(response.data.summaries)
-    } catch (err) {
-      console.error('Error fetching summary statistics:', err)
-      setError(err.response?.data?.detail || 'Failed to load summary statistics')
-    } finally {
-      setLoading(false)
+  // Round date to specified unit (year, month, or day)
+  const roundDate = (dateStr, unit) => {
+    const d = new Date(dateStr)
+    switch(unit) {
+      case 'year':
+        return d.getFullYear().toString()
+      case 'month':
+        return dateStr.slice(0, 7) // YYYY-MM
+      case 'day':
+        return dateStr // YYYY-MM-DD (already in this format)
+      default:
+        return dateStr
     }
   }
 
-  // Fetch single variable summary (optimized)
-  const fetchSingleVariableSummary = async (varName, varType, params = {}) => {
-    try {
-      setLoadingVars(prev => ({ ...prev, [varName]: true }))
+  // Compute frequency table from raw dates with specified rounding
+  const computeDateFrequency = (rawDates, rounding) => {
+    if (!rawDates || rawDates.length === 0) return []
 
-      const response = await api.post(`/api/summary-statistics/${fileId}/${varName}`, {
-        varType: varType,
-        ...params
-      })
+    // Round all dates
+    const roundedDates = rawDates.map(d => roundDate(d, rounding))
 
-      // Update only this variable's summary
-      setSummaryData(prev => ({
-        ...prev,
-        [varName]: response.data.summary
-      }))
-    } catch (err) {
-      console.error(`Error fetching summary for ${varName}:`, err)
-      // Optionally show error for this specific variable
-    } finally {
-      setLoadingVars(prev => ({ ...prev, [varName]: false }))
-    }
+    // Count occurrences
+    const counts = {}
+    roundedDates.forEach(d => {
+      counts[d] = (counts[d] || 0) + 1
+    })
+
+    // Convert to frequency table format
+    const total = roundedDates.length
+    const frequencyTable = Object.entries(counts).map(([name, count]) => ({
+      name,
+      count,
+      percentage: parseFloat(((count / total) * 100).toFixed(2))
+    }))
+
+    return frequencyTable
   }
+
+  // Randomly sample N items from array (seeded by key for consistency)
+  const sampleRandomItems = (items, n, key = 0) => {
+    if (!items || items.length === 0) return []
+
+    const sampleSize = Math.min(n, items.length)
+
+    // Simple seeded shuffle using the key
+    const shuffled = [...items]
+    let seed = key
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      // Simple seeded random using sine
+      seed = (seed * 9301 + 49297) % 233280
+      const random = seed / 233280
+      const j = Math.floor(random * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+
+    return shuffled.slice(0, sampleSize)
+  }
+
 
   const handleDateRoundingChange = (varName, rounding) => {
-    // Update rounding state
+    // Just update rounding state - no API call needed
+    // The frequency table will be recomputed on-demand in renderDateSummary
     setDateRounding(prev => ({
       ...prev,
       [varName]: rounding
     }))
-
-    // Fetch only this variable's summary with new rounding
-    fetchSingleVariableSummary(varName, 'date', { rounding })
   }
 
   const handleResample = (varName) => {
-    // Increment seed for this specific variable
-    setTextSeeds(prev => {
-      const newSeed = (prev[varName] || 42) + 1
-      const newSeeds = { ...prev, [varName]: newSeed }
-
-      // Fetch only this variable's summary with new seed
-      fetchSingleVariableSummary(varName, 'text', { seed: newSeed })
-
-      return newSeeds
-    })
+    // Increment sample key to trigger new random sample
+    setTextSampleKeys(prev => ({
+      ...prev,
+      [varName]: (prev[varName] || 0) + 1
+    }))
   }
 
   const handleSort = (varName, column) => {
@@ -240,6 +240,10 @@ export default function DataSummary({ fileId, variableAnalysis }) {
   }
 
   const renderDateSummary = (variable, summary) => {
+    // Compute frequency table on-demand based on current rounding
+    const currentRounding = dateRounding[variable.name] || 'year'
+    const frequencyTable = computeDateFrequency(summary.raw_dates, currentRounding)
+
     return (
       <div className="date-summary">
         <div className="basic-stats">
@@ -258,11 +262,11 @@ export default function DataSummary({ fileId, variableAnalysis }) {
         </div>
         <DateRoundingSelector
           variableName={variable.name}
-          currentRounding={dateRounding[variable.name] || 'day'}
+          currentRounding={currentRounding}
           onChange={handleDateRoundingChange}
         />
         <SortableFrequencyTable
-          data={summary.frequency_table}
+          data={frequencyTable}
           variableName={variable.name}
           sortConfig={sortConfig}
           onSort={handleSort}
@@ -273,6 +277,10 @@ export default function DataSummary({ fileId, variableAnalysis }) {
   }
 
   const renderTextSummary = (variable, summary) => {
+    // Sample on-demand from raw values
+    const sampleKey = textSampleKeys[variable.name] || 0
+    const samples = sampleRandomItems(summary.raw_values, 5, sampleKey)
+
     return (
       <div className="text-summary">
         <div className="basic-stats">
@@ -291,9 +299,9 @@ export default function DataSummary({ fileId, variableAnalysis }) {
               Re-sample
             </button>
           </div>
-          {summary.samples && summary.samples.length > 0 ? (
+          {samples && samples.length > 0 ? (
             <div className="text-samples-inline">
-              {summary.samples.map((sample, idx) => (
+              {samples.map((sample, idx) => (
                 <span key={idx} className="sample-pill">{sample}</span>
               ))}
             </div>
@@ -322,29 +330,11 @@ export default function DataSummary({ fileId, variableAnalysis }) {
     }
   }
 
-  if (loading) {
+  if (!variableAnalysis || variableAnalysis.length === 0 || !summaryData) {
     return (
       <div className="data-summary">
         <h2>Data Summary</h2>
-        <p className="loading-message">Loading summary statistics...</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="data-summary">
-        <h2>Data Summary</h2>
-        <div className="error">{error}</div>
-      </div>
-    )
-  }
-
-  if (!variableAnalysis || variableAnalysis.length === 0) {
-    return (
-      <div className="data-summary">
-        <h2>Data Summary</h2>
-        <p className="no-data">No variables to summarize</p>
+        <p className="loading-message">No summary data available</p>
       </div>
     )
   }
@@ -362,9 +352,8 @@ export default function DataSummary({ fileId, variableAnalysis }) {
             <span className="collapse-icon">{expandedVars[variable.name] ? '▼' : '▶'}</span>
             {variable.name}
             <span className="type-badge">{variable.currentType}</span>
-            {loadingVars[variable.name] && <span className="var-loading">Updating...</span>}
           </h3>
-          {expandedVars[variable.name] && renderSummaryByType(variable, summaryData?.[variable.name])}
+          {expandedVars[variable.name] && renderSummaryByType(variable, summaryData[variable.name])}
         </div>
       ))}
     </div>
@@ -440,7 +429,6 @@ function DateRoundingSelector({ variableName, currentRounding, onChange }) {
       >
         <option value="year">Year</option>
         <option value="month">Month</option>
-        <option value="week">Week</option>
         <option value="day">Day</option>
       </select>
     </div>

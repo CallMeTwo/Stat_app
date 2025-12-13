@@ -11,6 +11,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState('upload')
   const [uploadedFile, setUploadedFile] = useState(null)
   const [variableAnalysis, setVariableAnalysis] = useState(null)
+  const [summaryData, setSummaryData] = useState(null)
   const [analysisResults, setAnalysisResults] = useState(null)
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode')
@@ -40,15 +41,54 @@ function App() {
         isModified: false
       }))
       setVariableAnalysis(variablesWithState)
+
+      // Immediately fetch summary statistics for all variables
+      try {
+        const summaryResponse = await api.post(`/api/summary-statistics/${fileData.file_id}`, {
+          variables: variablesWithState
+        })
+        setSummaryData(summaryResponse.data.summaries)
+      } catch (summaryErr) {
+        console.error('Failed to fetch summary statistics:', summaryErr)
+        // Set empty object so page doesn't break
+        setSummaryData({})
+      }
     } catch (err) {
       console.error('Failed to analyze variables:', err)
       // Still allow user to proceed even if analysis fails
       setVariableAnalysis([])
+      setSummaryData({})
     }
   }
 
-  const handleVariableTypesChanged = (updatedVariables) => {
+  const handleVariableTypesChanged = async (updatedVariables) => {
+    // Find which variables had their type changed
+    const changedVariables = updatedVariables.filter((v, idx) => {
+      const oldVar = variableAnalysis[idx]
+      return oldVar && v.currentType !== oldVar.currentType
+    })
+
     setVariableAnalysis(updatedVariables)
+
+    // Fetch new summaries for variables whose type changed
+    if (changedVariables.length > 0 && uploadedFile) {
+      for (const variable of changedVariables) {
+        try {
+          const response = await api.post(
+            `/api/summary-statistics/${uploadedFile.file_id}/${variable.name}`,
+            { varType: variable.currentType }
+          )
+
+          // Update only this variable's summary
+          setSummaryData(prev => ({
+            ...prev,
+            [variable.name]: response.data.summary
+          }))
+        } catch (err) {
+          console.error(`Failed to update summary for ${variable.name}:`, err)
+        }
+      }
+    }
   }
 
   const handleAnalysisComplete = (results) => {
@@ -60,6 +100,7 @@ function App() {
     setCurrentPage('upload')
     setUploadedFile(null)
     setVariableAnalysis(null)
+    setSummaryData(null)
     setAnalysisResults(null)
   }
 
@@ -129,10 +170,10 @@ function App() {
             onVariableTypesChanged={handleVariableTypesChanged}
           />
         )}
-        {currentPage === 'summary' && uploadedFile && variableAnalysis && (
+        {currentPage === 'summary' && uploadedFile && variableAnalysis && summaryData && (
           <DataSummary
-            fileId={uploadedFile.file_id}
             variableAnalysis={variableAnalysis}
+            summaryData={summaryData}
           />
         )}
         {currentPage === 'analysis' && uploadedFile && (

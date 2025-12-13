@@ -606,10 +606,8 @@ def compute_categorical_summary(series):
         "frequency_table": frequency_table
     }
 
-def compute_date_summary(series, rounding='year'):
-    """Calculate summary statistics for date variables"""
-    import re
-
+def compute_date_summary(series):
+    """Calculate summary statistics for date variables - returns raw dates for frontend processing"""
     missing_count = series.isna().sum()
     missing_percent = (missing_count / len(series) * 100)
 
@@ -621,7 +619,7 @@ def compute_date_summary(series, rounding='year'):
             "max_date": None,
             "missing_count": int(missing_count),
             "missing_percent": round(missing_percent, 2),
-            "frequency_table": []
+            "raw_dates": []
         }
 
     # Try to parse dates
@@ -635,38 +633,18 @@ def compute_date_summary(series, rounding='year'):
                 "max_date": None,
                 "missing_count": int(missing_count),
                 "missing_percent": round(missing_percent, 2),
-                "frequency_table": []
+                "raw_dates": []
             }
 
-        # Round dates based on option
-        if rounding == 'year':
-            rounded_dates = dates.dt.to_period('Y').astype(str)
-        elif rounding == 'month':
-            rounded_dates = dates.dt.to_period('M').astype(str)
-        elif rounding == 'week':
-            rounded_dates = dates.dt.to_period('W').astype(str)
-        else:  # day
-            rounded_dates = dates.dt.date.astype(str)
-
-        # Create frequency table
-        value_counts = rounded_dates.value_counts()
-        total_count = len(rounded_dates)
-
-        frequency_table = []
-        for date_str, count in value_counts.items():
-            percentage = (count / total_count * 100) if total_count > 0 else 0
-            frequency_table.append({
-                "name": str(date_str),
-                "count": int(count),
-                "percentage": round(percentage, 2)
-            })
+        # Return raw dates as ISO strings for frontend to process
+        raw_dates = [d.date().isoformat() for d in dates]
 
         return {
             "min_date": str(dates.min().date()),
             "max_date": str(dates.max().date()),
             "missing_count": int(missing_count),
             "missing_percent": round(missing_percent, 2),
-            "frequency_table": frequency_table
+            "raw_dates": raw_dates
         }
     except Exception as e:
         logger.warning(f"Error computing date summary: {str(e)}")
@@ -675,11 +653,11 @@ def compute_date_summary(series, rounding='year'):
             "max_date": None,
             "missing_count": int(missing_count),
             "missing_percent": round(missing_percent, 2),
-            "frequency_table": []
+            "raw_dates": []
         }
 
-def compute_text_summary(series, seed=None):
-    """Calculate summary statistics for text variables"""
+def compute_text_summary(series):
+    """Calculate summary statistics for text variables - returns raw values for frontend sampling"""
     missing_count = series.isna().sum()
     missing_percent = (missing_count / len(series) * 100)
 
@@ -689,20 +667,16 @@ def compute_text_summary(series, seed=None):
         return {
             "missing_count": int(missing_count),
             "missing_percent": round(missing_percent, 2),
-            "samples": []
+            "raw_values": []
         }
 
-    # Get random samples
-    sample_size = min(5, len(non_null))
-    if seed is not None:
-        samples = non_null.sample(n=sample_size, random_state=seed)
-    else:
-        samples = non_null.sample(n=sample_size)
+    # Return all raw values for frontend to sample from
+    raw_values = [str(val) for val in non_null.tolist()]
 
     return {
         "missing_count": int(missing_count),
         "missing_percent": round(missing_percent, 2),
-        "samples": [str(s) for s in samples.tolist()]
+        "raw_values": raw_values
     }
 
 @app.post("/api/analyze-variables/{file_id}")
@@ -794,11 +768,10 @@ async def get_summary_statistics(file_id: str, request_data: dict = Body(...)):
                 summary = compute_categorical_summary(series)
                 summary['type'] = 'categorical'
             elif var_type == 'date':
-                rounding = date_rounding.get(var_name, 'day')
-                summary = compute_date_summary(series, rounding)
+                summary = compute_date_summary(series)
                 summary['type'] = 'date'
             elif var_type == 'text':
-                summary = compute_text_summary(series, text_seed)
+                summary = compute_text_summary(series)
                 summary['type'] = 'text'
             else:
                 logger.warning(f"Unknown type {var_type} for variable {var_name}")
@@ -833,10 +806,8 @@ async def get_single_variable_summary(file_id: str, variable_name: str, request_
         if variable_name not in df.columns:
             raise HTTPException(status_code=404, detail=f"Variable '{variable_name}' not found")
 
-        # Get variable type and parameters
+        # Get variable type
         var_type = request_data.get('varType')
-        rounding = request_data.get('rounding', 'year')  # For date variables
-        seed = request_data.get('seed', 42)  # For text variables
 
         if not var_type:
             raise HTTPException(status_code=400, detail="Variable type (varType) is required")
@@ -851,10 +822,10 @@ async def get_single_variable_summary(file_id: str, variable_name: str, request_
             summary = compute_categorical_summary(series)
             summary['type'] = 'categorical'
         elif var_type == 'date':
-            summary = compute_date_summary(series, rounding)
+            summary = compute_date_summary(series)
             summary['type'] = 'date'
         elif var_type == 'text':
-            summary = compute_text_summary(series, seed)
+            summary = compute_text_summary(series)
             summary['type'] = 'text'
         else:
             raise HTTPException(status_code=400, detail=f"Unknown variable type: {var_type}")
