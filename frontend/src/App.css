@@ -72,9 +72,9 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
-.nav button {
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #5568d3;
+.nav button:not(.theme-toggle) {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
   padding: 8px 16px;
   border-radius: 6px;
   border: 2px solid transparent;
@@ -83,17 +83,18 @@ body {
   font-size: 0.9rem;
 }
 
-.nav button:hover {
-  background-color: white;
+.nav button:not(.theme-toggle):hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: white;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .nav button.active {
-  background-color: white;
-  color: #667eea;
-  border-color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: #4CAF50;
+  color: white;
+  border-color: #45a049;
+  box-shadow: 0 3px 10px rgba(76, 175, 80, 0.4);
+  transform: translateY(-1px);
 }
 
 .main-content {
