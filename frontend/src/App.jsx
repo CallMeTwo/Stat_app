@@ -43,13 +43,6 @@ function App() {
       <nav className="nav">
         <span className="app-title">📊 Stats React</span>
         <button
-          className="theme-toggle"
-          onClick={() => setDarkMode(!darkMode)}
-          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        >
-          {darkMode ? '☀️' : '🌙'}
-        </button>
-        <button
           className={currentPage === 'upload' ? 'active' : ''}
           onClick={() => setCurrentPage('upload')}
         >
@@ -79,8 +72,12 @@ function App() {
             Results
           </button>
         )}
-        <button className="reset" onClick={resetApp}>
-          New Upload
+        <button
+          className="theme-toggle"
+          onClick={() => setDarkMode(!darkMode)}
+          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {darkMode ? '☀️' : '🌙'}
         </button>
       </nav>
 

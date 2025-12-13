@@ -54,21 +54,22 @@ body {
 }
 
 .theme-toggle {
-  background-color: rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
-  padding: 8px 12px !important;
-  border-radius: 50% !important;
-  font-size: 1.2rem !important;
-  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #5568d3 !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  font-size: 1.1rem !important;
+  border: 2px solid transparent !important;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-right: 10px;
+  margin-left: auto !important;
+  font-weight: 600 !important;
 }
 
 .theme-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.3) !important;
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  transform: rotate(180deg) scale(1.1);
+  background-color: white !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
 .nav button {
@@ -93,16 +94,6 @@ body {
   color: #667eea;
   border-color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.nav button.reset {
-  margin-left: auto;
-  background-color: rgba(231, 76, 60, 0.9);
-  color: white;
-}
-
-.nav button.reset:hover {
-  background-color: #e74c3c;
 }
 
 .main-content {
