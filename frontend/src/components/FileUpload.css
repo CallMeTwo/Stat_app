@@ -24,6 +24,8 @@
 .upload-section {
   display: flex;
   flex-direction: column;
+  padding-right: 30px;
+  border-right: 2px solid var(--border-color);
 }
 
 .upload-section .description {
@@ -199,6 +201,11 @@
   .upload-layout {
     grid-template-columns: 1fr;
     gap: 30px;
+  }
+
+  .upload-section {
+    padding-right: 0;
+    border-right: none;
   }
 
   .sample-data-section {
