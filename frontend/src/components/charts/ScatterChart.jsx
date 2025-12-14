@@ -11,10 +11,32 @@ export function ScatterChartComponent({ data, selectedVars, colorVar }) {
     return <div className="no-data">No valid data for scatter plot</div>
   }
 
+  // Calculate X-axis domain: min - range/10 to max + range/10
+  const xValues = transformedData.map(item => item.x)
+  const xMin = Math.min(...xValues)
+  const xMax = Math.max(...xValues)
+  const xRange = xMax - xMin
+  const xAxisDomain = [xMin - xRange / 10, xMax + xRange / 10]
+
+  // Calculate Y-axis domain: min - range/10 to max + range/10
+  const yValues = transformedData.map(item => item.y)
+  const yMin = Math.min(...yValues)
+  const yMax = Math.max(...yValues)
+  const yRange = yMax - yMin
+  const yAxisDomain = [yMin - yRange / 10, yMax + yRange / 10]
+
+  // Determine point size and opacity based on data density
+  const dataCount = transformedData.length
+  const pointRadius = dataCount > 1000 ? 2 : dataCount > 500 ? 2.5 : 3.5
+  const pointOpacity = dataCount > 1000 ? 0.4 : dataCount > 500 ? 0.5 : 0.7
+
   const colors = colorVar ? [...new Set(data.map(row => row[colorVar]).filter(v => v != null))] : null
 
+  // Responsive height: 400px on mobile, 600px on desktop
+  const chartHeight = typeof window !== 'undefined' && window.innerWidth < 768 ? 400 : 600
+
   return (
-    <ResponsiveContainer width="100%" height={600}>
+    <ResponsiveContainer width="100%" height={chartHeight}>
       <ScatterChart
         margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
       >
@@ -24,12 +46,16 @@ export function ScatterChartComponent({ data, selectedVars, colorVar }) {
           type="number"
           label={{ value: xVar, position: 'insideBottomRight', offset: -10 }}
           tick={{ fontSize: 12 }}
+          domain={xAxisDomain}
+          tickFormatter={(value) => Math.round(value * 100) / 100}
         />
         <YAxis
           dataKey="y"
           type="number"
           label={{ value: yVar, angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
+          domain={yAxisDomain}
+          tickFormatter={(value) => Math.round(value * 100) / 100}
         />
         <Tooltip
           contentStyle={{
@@ -49,6 +75,8 @@ export function ScatterChartComponent({ data, selectedVars, colorVar }) {
                 name={color}
                 data={transformedData.filter(d => d.group === color)}
                 fill={getColor(idx)}
+                r={pointRadius}
+                fillOpacity={pointOpacity}
               />
             ))}
           </>
@@ -57,6 +85,8 @@ export function ScatterChartComponent({ data, selectedVars, colorVar }) {
             name={`${xVar} vs ${yVar}`}
             data={transformedData}
             fill="#8884d8"
+            r={pointRadius}
+            fillOpacity={pointOpacity}
           />
         )}
       </ScatterChart>

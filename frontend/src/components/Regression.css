@@ -1,0 +1,565 @@
+.regression {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.regression h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.regression > .description {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+.regression .no-data {
+  background-color: #f0f0f0;
+  padding: 2rem;
+  border-radius: 8px;
+  color: #666;
+  text-align: center;
+}
+
+/* Regression Type Selector */
+.regression-type-selector {
+  margin-bottom: 3rem;
+}
+
+.selector-header h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.selector-description {
+  color: #666;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.regression-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.regression-button {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  font-family: inherit;
+  outline: none;
+}
+
+.regression-button:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.regression-button.selected {
+  border-color: #667eea;
+  background-color: #f8f9fd;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.regression-button:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.button-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-content h4 {
+  font-size: 1.1rem;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.button-content p {
+  color: #666;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Variable Selectors */
+.regression-variable-selectors {
+  background-color: #f9f9f9;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.variable-selectors-header h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin: 0 0 1.5rem 0;
+  font-weight: 600;
+}
+
+.variable-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.variable-section h4 {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.variable-dropdown,
+.variable-multi-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.variable-dropdown label,
+.variable-multi-select label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.required {
+  color: #e74c3c;
+  margin-left: 0.25rem;
+}
+
+.variable-select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background-color: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.variable-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.variable-info {
+  font-size: 0.85rem;
+  color: #666;
+  padding: 0.5rem 0;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 0.75rem;
+}
+
+/* Multi-select controls */
+.multi-select-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.multi-select-controls .variable-select {
+  flex: 1;
+}
+
+.selected-variables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.selected-variable-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #667eea;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.tag-name {
+  font-weight: 600;
+}
+
+.tag-info {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  margin-left: 0.25rem;
+  display: flex;
+  align-items: center;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.tag-remove:hover {
+  opacity: 1;
+}
+
+/* Regression Actions */
+.regression-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.run-regression-button {
+  padding: 0.75rem 2rem;
+  background-color: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.run-regression-button:hover:not(:disabled) {
+  background-color: #5568d3;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.run-regression-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Error Display */
+.error {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.error strong {
+  color: #c33;
+  font-weight: 600;
+}
+
+/* Loading Message */
+.loading-message {
+  text-align: center;
+  padding: 2rem;
+  color: #667eea;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Regression Results */
+.regression-results {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  margin-top: 2rem;
+}
+
+.results-header {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 1rem;
+}
+
+.results-header h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.results-subtitle {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.results-section {
+  margin-bottom: 2.5rem;
+}
+
+.results-section:last-child {
+  margin-bottom: 0;
+}
+
+.results-section h3 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 0.75rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  color: #333;
+  font-weight: 600;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+/* Coefficients Table */
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.coefficients-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+.coefficients-table thead {
+  background-color: #f5f5f5;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.coefficients-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+  border-right: 1px solid #e0e0e0;
+}
+
+.coefficients-table th:last-child {
+  border-right: none;
+}
+
+.coefficients-table td {
+  padding: 0.75rem 1rem;
+  border-right: 1px solid #f0f0f0;
+  font-size: 0.9rem;
+  color: #333;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.coefficients-table td:last-child {
+  border-right: none;
+}
+
+.coefficients-table td.var-name {
+  font-family: inherit;
+  font-weight: 600;
+  color: #333;
+}
+
+.coefficients-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.coefficients-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.coefficients-table tbody tr.significant {
+  background-color: #fffbf0;
+}
+
+.coefficients-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table-note {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* Assumptions */
+.assumptions-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.assumption-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.assumption-result {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.assumption-result.passed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.assumption-result.failed {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.assumption-content {
+  flex: 1;
+}
+
+.assumption-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.assumption-details {
+  font-size: 0.85rem;
+  color: #666;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.vif-detail {
+  display: inline;
+}
+
+/* Interpretation */
+.interpretation-text {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .regression {
+    padding: 1.5rem;
+  }
+
+  .regression h2 {
+    font-size: 1.5rem;
+  }
+
+  .regression-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .regression-button {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .button-icon {
+    font-size: 2rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .regression-variable-selectors {
+    padding: 1.5rem;
+  }
+
+  .table-container {
+    font-size: 0.8rem;
+  }
+
+  .coefficients-table th,
+  .coefficients-table td {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .regression {
+    padding: 1rem;
+  }
+
+  .regression h2 {
+    font-size: 1.25rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .variable-select {
+    font-size: 16px;
+  }
+}

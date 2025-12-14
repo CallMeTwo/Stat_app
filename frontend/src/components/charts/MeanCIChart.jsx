@@ -1,4 +1,4 @@
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ErrorBar } from 'recharts'
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ErrorBar, Cell } from 'recharts'
 
 export function MeanCIChart({ data, selectedVars, groupVar }) {
   if (!data || data.length === 0) return <div className="no-data">No data available</div>
@@ -10,8 +10,18 @@ export function MeanCIChart({ data, selectedVars, groupVar }) {
     return <div className="no-data">No valid data for mean ± CI plot</div>
   }
 
+  // Calculate Y-axis domain: min - range/10 to max + range/10
+  const allValues = transformedData.flatMap(item => [item.ciLow, item.mean, item.ciHigh])
+  const minValue = Math.min(...allValues)
+  const maxValue = Math.max(...allValues)
+  const range = maxValue - minValue
+  const yAxisDomain = [minValue - range / 10, maxValue + range / 10]
+
+  // Responsive height: 400px on mobile, 600px on desktop
+  const chartHeight = typeof window !== 'undefined' && window.innerWidth < 768 ? 400 : 600
+
   return (
-    <ResponsiveContainer width="100%" height={600}>
+    <ResponsiveContainer width="100%" height={chartHeight}>
       <ScatterChart
         data={transformedData}
         margin={{ top: 20, right: 30, left: 60, bottom: 80 }}
@@ -30,6 +40,8 @@ export function MeanCIChart({ data, selectedVars, groupVar }) {
           type="number"
           label={{ value: numericVar, angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
+          domain={yAxisDomain}
+          tickFormatter={(value) => Math.round(value * 100) / 100}
         />
         <Tooltip
           content={({ active, payload }) => {
@@ -50,13 +62,16 @@ export function MeanCIChart({ data, selectedVars, groupVar }) {
           }}
           cursor={{ fill: 'rgba(0,0,0,0.1)' }}
         />
-        <Scatter dataKey="mean" fill="#8884d8" name="Mean">
+        <Scatter dataKey="mean" name="Mean">
           <ErrorBar
             dataKey="ciRange"
             width={4}
             strokeWidth={2}
             stroke="#666"
           />
+          {transformedData.map((item, idx) => (
+            <Cell key={`point-${idx}`} fill={getColor(idx)} />
+          ))}
         </Scatter>
       </ScatterChart>
     </ResponsiveContainer>
@@ -142,4 +157,9 @@ function getTValue(df, alpha) {
   if (df >= 2) return 4.303
   if (df >= 1) return 12.706
   return 1.96
+}
+
+function getColor(index) {
+  const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1', '#d084d0', '#ffa500']
+  return colors[index % colors.length]
 }

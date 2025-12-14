@@ -5,7 +5,8 @@ import DataDisplay from './components/DataDisplay'
 import DataTypeValidation from './components/DataTypeValidation'
 import DataSummary from './components/DataSummary'
 import Visualization from './components/Visualization'
-import AnalysisPanel from './components/AnalysisPanel'
+import Analysis from './components/Analysis'
+import Regression from './components/Regression'
 import api from './services/api'
 
 function App() {
@@ -147,6 +148,12 @@ function App() {
             >
               Analysis
             </button>
+            <button
+              className={currentPage === 'regression' ? 'active' : ''}
+              onClick={() => setCurrentPage('regression')}
+            >
+              Regression
+            </button>
           </>
         )}
         {analysisResults && (
@@ -190,10 +197,15 @@ function App() {
           />
         )}
         {currentPage === 'analysis' && uploadedFile && (
-          <AnalysisPanel
+          <Analysis
             fileId={uploadedFile.file_id}
             variableAnalysis={variableAnalysis}
-            onAnalysisComplete={handleAnalysisComplete}
+          />
+        )}
+        {currentPage === 'regression' && uploadedFile && (
+          <Regression
+            fileId={uploadedFile.file_id}
+            variableAnalysis={variableAnalysis}
           />
         )}
         {currentPage === 'results' && analysisResults && (

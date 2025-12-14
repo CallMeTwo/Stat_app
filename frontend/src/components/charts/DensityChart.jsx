@@ -14,8 +14,18 @@ export function DensityChart({ data, selectedVars, groupVar }) {
     ? [...new Set(data.map(row => row[groupVar]).filter(v => v != null))]
     : null
 
+  // Calculate X-axis domain: min - range/10 to max + range/10
+  const xValues = transformedData.map(item => item.x)
+  const minValue = Math.min(...xValues)
+  const maxValue = Math.max(...xValues)
+  const range = maxValue - minValue
+  const xAxisDomain = [minValue - range / 10, maxValue + range / 10]
+
+  // Responsive height: 400px on mobile, 600px on desktop
+  const chartHeight = typeof window !== 'undefined' && window.innerWidth < 768 ? 400 : 600
+
   return (
-    <ResponsiveContainer width="100%" height={600}>
+    <ResponsiveContainer width="100%" height={chartHeight}>
       <LineChart
         data={transformedData}
         margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
@@ -26,10 +36,13 @@ export function DensityChart({ data, selectedVars, groupVar }) {
           type="number"
           label={{ value: numericVar, position: 'insideBottomRight', offset: -10 }}
           tick={{ fontSize: 12 }}
+          domain={xAxisDomain}
+          tickFormatter={(value) => Math.round(value * 100) / 100}
         />
         <YAxis
           label={{ value: 'Density', angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
+          tickFormatter={(value) => Math.round(value * 100) / 100}
         />
         <Tooltip
           contentStyle={{

@@ -1,4 +1,4 @@
-import { ComposedChart, Bar, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { ComposedChart, Bar, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 
 // Custom shape for horizontal lines (whisker ends)
 const HorizonBar = (props) => {
@@ -13,13 +13,13 @@ const HorizonBar = (props) => {
       y1={cy}
       x2={cx + lineWidth / 2}
       y2={cy}
-      stroke="#666"
+      stroke="#000"
       strokeWidth={2}
     />
   )
 }
 
-// Custom shape for median line (red)
+// Custom shape for median line (black)
 const MedianBar = (props) => {
   const { x, y, width, height } = props
   const cx = x + width / 2
@@ -31,7 +31,7 @@ const MedianBar = (props) => {
       y1={cy}
       x2={x + width}
       y2={cy}
-      stroke="#d32f2f"
+      stroke="#000"
       strokeWidth={2.5}
     />
   )
@@ -48,10 +48,17 @@ const DotBar = (props) => {
       y1={y}
       x2={cx}
       y2={y + height}
-      stroke="#666"
+      stroke="#000"
       strokeWidth={1}
     />
   )
+}
+
+
+// Color palette for different groups
+function getBoxColor(index) {
+  const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#8dd1e1', '#d084d0', '#ffa500']
+  return colors[index % colors.length]
 }
 
 export function BoxChart({ data, selectedVars, groupVar }) {
@@ -68,15 +75,6 @@ export function BoxChart({ data, selectedVars, groupVar }) {
   const xDataKey = groupVar ? 'group' : 'label'
   const outlierData = prepareOutlierData(transformedData, groupVar)
 
-  // Debug: log data
-  if (groupVar) {
-    console.log('BoxChart grouped data:', {
-      transformedDataLength: transformedData.length,
-      transformedDataGroups: transformedData.map(d => d.group),
-      outlierDataLength: outlierData.length,
-      outlierDataGroups: [...new Set(outlierData.map(d => d[xDataKey]))]
-    })
-  }
 
   // Calculate Y-axis domain: min - range/10 to max + range/10
   const allValues = []
@@ -142,30 +140,50 @@ export function BoxChart({ data, selectedVars, groupVar }) {
           cursor={{ fill: 'rgba(0,0,0,0.1)' }}
         />
         {/* Invisible bar to offset from bottom */}
-        <Bar stackId="a" dataKey="min" fill="none" />
+        <Bar stackId="a" dataKey="min" fill="none" maxBarSize={40} />
         {/* Lower whisker cap */}
-        <Bar stackId="a" dataKey="whiskerLowCap" shape={<HorizonBar />} />
+        <Bar stackId="a" dataKey="whiskerLowCap" shape={<HorizonBar />} maxBarSize={40} />
         {/* Lower whisker line */}
-        <Bar stackId="a" dataKey="bottomWhisker" shape={<DotBar />} />
-        {/* Bottom box (Q1 to Median) */}
-        <Bar stackId="a" dataKey="bottomBox" fill="#8884d8" stroke="#666" strokeWidth={1} />
+        <Bar stackId="a" dataKey="bottomWhisker" shape={<DotBar />} maxBarSize={40} />
+        {/* Bottom box (Q1 to Median) - colored by group index */}
+        <Bar
+          stackId="a"
+          dataKey="bottomBox"
+          maxBarSize={40}
+          stroke="#000"
+          strokeWidth={1}
+        >
+          {transformedData.map((item, idx) => (
+            <Cell key={`bottomBox-${idx}`} fill={getBoxColor(idx)} />
+          ))}
+        </Bar>
         {/* Median line */}
-        <Bar stackId="a" dataKey="medianLine" shape={<MedianBar />} />
-        {/* Top box (Median to Q3) */}
-        <Bar stackId="a" dataKey="topBox" fill="#8884d8" stroke="#666" strokeWidth={1} />
+        <Bar stackId="a" dataKey="medianLine" shape={<MedianBar />} maxBarSize={40} />
+        {/* Top box (Median to Q3) - colored by group index */}
+        <Bar
+          stackId="a"
+          dataKey="topBox"
+          maxBarSize={40}
+          stroke="#000"
+          strokeWidth={1}
+        >
+          {transformedData.map((item, idx) => (
+            <Cell key={`topBox-${idx}`} fill={getBoxColor(idx)} />
+          ))}
+        </Bar>
         {/* Upper whisker line */}
-        <Bar stackId="a" dataKey="topWhisker" shape={<DotBar />} />
+        <Bar stackId="a" dataKey="topWhisker" shape={<DotBar />} maxBarSize={40} />
         {/* Upper whisker cap */}
-        <Bar stackId="a" dataKey="whiskerHighCap" shape={<HorizonBar />} />
+        <Bar stackId="a" dataKey="whiskerHighCap" shape={<HorizonBar />} maxBarSize={40} />
         {/* Outliers as scatter points */}
         {outlierData.length > 0 && (
           <Scatter
             data={outlierData}
             dataKey="value"
-            fill="red"
+            fill="none"
             stroke="#d32f2f"
-            strokeWidth={0.5}
-            shape="circle"
+            strokeWidth={1}
+            r={2.5}
           />
         )}
       </ComposedChart>
@@ -205,6 +223,7 @@ export function transformBoxPlotData(data, numericVar, groupVar) {
       const stats = calculateBoxPlotStats(groupValues)
       return {
         group,
+        groupIndex: idx,
         ...stats,
         ...convertToStackedData(stats),
       }

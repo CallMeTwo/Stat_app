@@ -48,6 +48,7 @@ export function BarChartComponent({
             border: '1px solid #ccc',
             borderRadius: '4px'
           }}
+          formatter={(value) => value ? value.toFixed(3) : 'N/A'}
           cursor={{ fill: 'rgba(0,0,0,0.1)' }}
         />
         {stackGroups ? (

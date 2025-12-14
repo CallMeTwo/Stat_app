@@ -12,6 +12,8 @@ import numpy as np
 from scipy import stats
 import logging
 from pathlib import Path
+from routes.statistical_tests import router as statistical_tests_router
+from routes.regression import router as regression_router
 
 # Load environment variables
 load_dotenv()
@@ -53,6 +55,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include statistical tests router
+app.include_router(statistical_tests_router)
+
+# Include regression router
+app.include_router(regression_router)
 
 # Mount static files from frontend build
 static_dir = Path(__file__).parent.parent / "frontend" / "dist"
@@ -451,7 +459,7 @@ def is_categorical_type(series, total_rows):
     """Check if a pandas Series should be categorical"""
     unique_count = series.nunique()
     threshold = min(total_rows * 0.5, 20)
-    return unique_count < threshold
+    return unique_count <= threshold
 
 def detect_variable_type(series, total_rows):
     """Detect the most appropriate type for a variable"""
@@ -709,12 +717,39 @@ async def analyze_variables(file_id: str):
             # Get sample values
             sample_values = get_sample_values(series, n=5)
 
+            # Get unique values for categorical variables or all variables for reference
+            unique_values = []
+            if detected_type == 'categorical':
+                unique_values = series.dropna().unique().tolist()
+            else:
+                # Even for numeric variables, get unique values for validation purposes
+                # This allows frontend to determine class counts for binary/grouped analyses
+                unique_vals = series.dropna().unique()
+                if len(unique_vals) <= 20:  # Only include if reasonable number of unique values
+                    unique_values = unique_vals.tolist()
+
+            # Get min/max for numeric variables
+            min_val = None
+            max_val = None
+            if detected_type == 'numeric':
+                numeric_series = pd.to_numeric(series, errors='coerce')
+                min_val = numeric_series.min()
+                max_val = numeric_series.max()
+                # Convert numpy types to Python floats for JSON serialization
+                if pd.notna(min_val):
+                    min_val = float(min_val)
+                if pd.notna(max_val):
+                    max_val = float(max_val)
+
             variables.append({
                 "name": col,
                 "detected_type": detected_type,
                 "missingness": int(missing_count),
                 "missingness_percent": round(missing_percent, 2),
                 "unique_count": int(unique_count),
+                "unique_values": unique_values,
+                "min": min_val,
+                "max": max_val,
                 "sample_values": sample_values,
                 "total_count": total_rows
             })

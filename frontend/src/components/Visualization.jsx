@@ -136,8 +136,6 @@ export default function Visualization({ fileId, variableAnalysis }) {
         <p className="no-data">Please upload a file first to create visualizations.</p>
       ) : (
         <>
-          {loading && <p className="loading-message">Loading data...</p>}
-
           <PlotTypeSelector
             selectedType={plotType}
             onSelect={handlePlotTypeSelect}
@@ -190,19 +188,52 @@ function PlotTypeSelector({ selectedType, onSelect }) {
     { id: 'scatter', name: 'Scatter Plot', icon: '⚫' }
   ]
 
+  const handleKeyDown = (e, currentIndex) => {
+    let nextIndex = currentIndex
+
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % plotTypes.length
+      e.preventDefault()
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + plotTypes.length) % plotTypes.length
+      e.preventDefault()
+    }
+
+    if (nextIndex !== currentIndex) {
+      onSelect(plotTypes[nextIndex].id)
+      // Focus the newly selected button
+      setTimeout(() => {
+        const buttons = document.querySelectorAll('.plot-type-card')
+        buttons[nextIndex]?.focus()
+      }, 0)
+    }
+  }
+
+  const currentIndex = plotTypes.findIndex(t => t.id === selectedType)
+  const [focusedIndex, setFocusedIndex] = useState(currentIndex >= 0 ? currentIndex : 0)
+
+  const handleFocus = (idx) => {
+    setFocusedIndex(idx)
+  }
+
   return (
     <div className="plot-type-selector">
       <h3>Select Plot Type</h3>
       <div className="plot-type-grid">
-        {plotTypes.map(type => (
-          <div
+        {plotTypes.map((type, idx) => (
+          <button
             key={type.id}
             className={`plot-type-card ${selectedType === type.id ? 'selected' : ''}`}
             onClick={() => onSelect(type.id)}
+            onKeyDown={(e) => handleKeyDown(e, idx)}
+            onFocus={() => handleFocus(idx)}
+            aria-pressed={selectedType === type.id}
+            title={type.name}
+            tabIndex={selectedType === type.id ? 0 : -1}
           >
             <div className="plot-icon">{type.icon}</div>
             <div className="plot-name">{type.name}</div>
-          </div>
+          </button>
         ))}
       </div>
     </div>
