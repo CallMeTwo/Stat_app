@@ -1,70 +1,56 @@
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { ComposedChart, Bar, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
-// Custom Box and Whisker Shape
-const BoxWhiskerShape = (props) => {
-  const { cx, cy, payload, xAxis, yAxis } = props
-
-  if (!payload || !payload.q1) return null
-
-  const { q1, q2, q3, whiskerLow, whiskerHigh, outliers = [] } = payload
-
-  // Convert data values to pixel coordinates
-  const getY = (value) => {
-    const scale = yAxis.scale
-    return scale(value)
-  }
-
-  const boxWidth = 40
-  const left = cx - boxWidth / 2
-  const right = cx + boxWidth / 2
-
-  const y1 = getY(q1)
-  const y2 = getY(q2)
-  const y3 = getY(q3)
-  const yWhiskerLow = getY(whiskerLow)
-  const yWhiskerHigh = getY(whiskerHigh)
+// Custom shape for horizontal lines (whisker ends)
+const HorizonBar = (props) => {
+  const { x, y, width, height } = props
+  const lineWidth = width * 0.6
+  const cx = x + width / 2
+  const cy = y + height / 2
 
   return (
-    <g>
-      {/* Lower whisker line */}
-      <line x1={cx} y1={y1} x2={cx} y2={yWhiskerLow} stroke="#666" strokeWidth={1} />
-      <line x1={left + 10} y1={yWhiskerLow} x2={right - 10} y2={yWhiskerLow} stroke="#666" strokeWidth={1} />
+    <line
+      x1={cx - lineWidth / 2}
+      y1={cy}
+      x2={cx + lineWidth / 2}
+      y2={cy}
+      stroke="#666"
+      strokeWidth={2}
+    />
+  )
+}
 
-      {/* Box (IQR) */}
-      <rect
-        x={left}
-        y={y3}
-        width={boxWidth}
-        height={y1 - y3}
-        fill="#8884d8"
-        fillOpacity={0.7}
-        stroke="#666"
-        strokeWidth={1}
-      />
+// Custom shape for median line (red)
+const MedianBar = (props) => {
+  const { x, y, width, height } = props
+  const cx = x + width / 2
+  const cy = y + height / 2
 
-      {/* Median line */}
-      <line x1={left} y1={y2} x2={right} y2={y2} stroke="#d32f2f" strokeWidth={2} />
+  return (
+    <line
+      x1={x}
+      y1={cy}
+      x2={x + width}
+      y2={cy}
+      stroke="#d32f2f"
+      strokeWidth={2.5}
+    />
+  )
+}
 
-      {/* Upper whisker line */}
-      <line x1={cx} y1={y3} x2={cx} y2={yWhiskerHigh} stroke="#666" strokeWidth={1} />
-      <line x1={left + 10} y1={yWhiskerHigh} x2={right - 10} y2={yWhiskerHigh} stroke="#666" strokeWidth={1} />
+// Custom shape for vertical whisker lines
+const DotBar = (props) => {
+  const { x, y, width, height } = props
+  const cx = x + width / 2
 
-      {/* Outliers */}
-      {outliers.map((outlier, idx) => {
-        const yOutlier = getY(outlier)
-        return (
-          <circle
-            key={idx}
-            cx={cx}
-            cy={yOutlier}
-            r={3}
-            fill="none"
-            stroke="#d32f2f"
-            strokeWidth={1.5}
-          />
-        )
-      })}
-    </g>
+  return (
+    <line
+      x1={cx}
+      y1={y}
+      x2={cx}
+      y2={y + height}
+      stroke="#666"
+      strokeWidth={1}
+    />
   )
 }
 
@@ -78,39 +64,43 @@ export function BoxChart({ data, selectedVars, groupVar }) {
     return <div className="no-data">No valid data for box plot</div>
   }
 
+  // Prepare outlier data for scatter plot
+  const xDataKey = groupVar ? 'group' : 'label'
+  const outlierData = prepareOutlierData(transformedData, groupVar)
+  
   return (
     <ResponsiveContainer width="100%" height={600}>
-      <ScatterChart
+      <ComposedChart
+        data={transformedData}
         margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
       >
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,200,200,0.2)" />
         <XAxis
-          type="category"
-          dataKey={groupVar ? 'group' : 'label'}
+          dataKey={xDataKey}
           angle={-45}
           textAnchor="end"
           height={100}
           tick={{ fontSize: 12 }}
+          allowDuplicatedCategory={false}
           label={{ value: groupVar || numericVar, position: 'insideBottomRight', offset: -10 }}
         />
         <YAxis
-          type="number"
           label={{ value: numericVar, angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
           domain={['auto', 'auto']}
         />
         <Tooltip
           content={({ active, payload }) => {
-            if (active && payload && payload[0]) {
+            if (active && payload && payload.length > 0) {
               const data = payload[0].payload
               return (
                 <div className="custom-tooltip">
                   <p><strong>{data.group || data.label}</strong></p>
-                  <p style={{ marginTop: '8px' }}>Lower fence: <strong>{data.whiskerLow.toFixed(2)}</strong></p>
-                  <p>Q1: <strong>{data.q1.toFixed(2)}</strong></p>
-                  <p>Median: <strong>{data.q2.toFixed(2)}</strong></p>
-                  <p>Q3: <strong>{data.q3.toFixed(2)}</strong></p>
-                  <p>Upper fence: <strong>{data.whiskerHigh.toFixed(2)}</strong></p>
+                  <p style={{ marginTop: '8px' }}>Lower fence: <strong>{data.whiskerLow?.toFixed(2)}</strong></p>
+                  <p>Q1: <strong>{data.q1?.toFixed(2)}</strong></p>
+                  <p>Median: <strong>{data.q2?.toFixed(2)}</strong></p>
+                  <p>Q3: <strong>{data.q3?.toFixed(2)}</strong></p>
+                  <p>Upper fence: <strong>{data.whiskerHigh?.toFixed(2)}</strong></p>
                   {data.outliers && data.outliers.length > 0 && (
                     <p style={{ marginTop: '8px', fontSize: '0.85rem', opacity: 0.8 }}>
                       Outliers: {data.outliers.length}
@@ -123,15 +113,34 @@ export function BoxChart({ data, selectedVars, groupVar }) {
           }}
           cursor={{ fill: 'rgba(0,0,0,0.1)' }}
         />
-        <Scatter
-          data={transformedData}
-          shape={<BoxWhiskerShape />}
-        >
-          {transformedData.map((entry, index) => (
-            <Cell key={`cell-${index}`} />
-          ))}
-        </Scatter>
-      </ScatterChart>
+        {/* Invisible bar to offset from bottom */}
+        <Bar stackId="a" dataKey="min" fill="none" />
+        {/* Lower whisker cap */}
+        <Bar stackId="a" dataKey="whiskerLowCap" shape={<HorizonBar />} />
+        {/* Lower whisker line */}
+        <Bar stackId="a" dataKey="bottomWhisker" shape={<DotBar />} />
+        {/* Bottom box (Q1 to Median) */}
+        <Bar stackId="a" dataKey="bottomBox" fill="#8884d8" stroke="#666" strokeWidth={1} />
+        {/* Median line */}
+        <Bar stackId="a" dataKey="medianLine" shape={<MedianBar />} />
+        {/* Top box (Median to Q3) */}
+        <Bar stackId="a" dataKey="topBox" fill="#8884d8" stroke="#666" strokeWidth={1} />
+        {/* Upper whisker line */}
+        <Bar stackId="a" dataKey="topWhisker" shape={<DotBar />} />
+        {/* Upper whisker cap */}
+        <Bar stackId="a" dataKey="whiskerHighCap" shape={<HorizonBar />} />
+        {/* Outliers as scatter points */}
+        {outlierData.length > 0 && (
+          <Scatter
+            data={outlierData}
+            dataKey="value"
+            fill="red"
+            stroke="#d32f2f"
+            strokeWidth={0.5}
+            shape="circle"
+          />
+        )}
+      </ComposedChart>
     </ResponsiveContainer>
   )
 }
@@ -151,9 +160,8 @@ export function transformBoxPlotData(data, numericVar, groupVar) {
     const stats = calculateBoxPlotStats(values)
     return [{
       label: numericVar,
-      x: 0,
-      y: stats.q2, // Use median for positioning
       ...stats,
+      ...convertToStackedData(stats),
     }]
   } else {
     // Multiple box plots grouped
@@ -169,12 +177,48 @@ export function transformBoxPlotData(data, numericVar, groupVar) {
       const stats = calculateBoxPlotStats(groupValues)
       return {
         group,
-        x: idx,
-        y: stats.q2, // Use median for positioning
         ...stats,
+        ...convertToStackedData(stats),
       }
     }).filter(item => item !== null)
   }
+}
+
+// Convert box plot stats to stacked bar data
+function convertToStackedData(stats) {
+  const { whiskerLow, q1, q2, q3, whiskerHigh } = stats
+
+  return {
+    min: whiskerLow, // Start from the lowest whisker
+    whiskerLowCap: 0, // Just a line, no height
+    bottomWhisker: q1 - whiskerLow, // From whiskerLow to Q1
+    bottomBox: q2 - q1, // From Q1 to median
+    medianLine: 0, // Just a line, no height
+    topBox: q3 - q2, // From median to Q3
+    topWhisker: whiskerHigh - q3, // From Q3 to whiskerHigh
+    whiskerHighCap: 0, // Just a line, no height
+  }
+}
+
+// Prepare outlier data for scatter plot
+function prepareOutlierData(transformedData, groupVar) {
+  const scatterData = []
+  const xKey = groupVar ? 'group' : 'label'
+
+  transformedData.forEach((item) => {
+    if (item.outliers && item.outliers.length > 0) {
+      const xValue = groupVar ? item.group : item.label
+
+      item.outliers.forEach(outlierValue => {
+        scatterData.push({
+          [xKey]: xValue,
+          value: outlierValue
+        })
+      })
+    }
+  })
+
+  return scatterData
 }
 
 function calculateBoxPlotStats(values) {
