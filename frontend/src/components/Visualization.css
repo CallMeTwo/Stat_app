@@ -1,6 +1,6 @@
 .visualization {
   background-color: var(--bg-secondary);
-  padding: 40px;
+  padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px var(--shadow);
   color: var(--text-primary);
@@ -10,15 +10,13 @@
 }
 
 .visualization h2 {
-  margin-bottom: 10px;
-  font-size: 1.8rem;
+  margin-bottom: 5px;
+  font-size: 1.6rem;
   color: var(--text-primary);
 }
 
 .description {
-  color: var(--text-secondary);
-  margin-bottom: 30px;
-  font-size: 1.05rem;
+  display: none;
 }
 
 .no-data {
@@ -41,34 +39,35 @@
 
 /* Plot Type Selector */
 .plot-type-selector {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .plot-type-selector h3 {
-  margin-bottom: 12px;
-  font-size: 1.1rem;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
   color: var(--text-primary);
+  font-weight: 600;
 }
 
 .plot-type-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 10px;
-  margin-bottom: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
 .plot-type-card {
   background-color: var(--bg-tertiary);
   border: 2px solid var(--border-color);
   border-radius: 6px;
-  padding: 10px 8px;
+  padding: 6px 4px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   font-size: inherit;
   font-family: inherit;
   color: inherit;
@@ -87,11 +86,11 @@
 }
 
 .plot-icon {
-  font-size: 1.5rem;
+  font-size: 1rem;
 }
 
 .plot-name {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -100,8 +99,8 @@
 .variable-selectors {
   background-color: var(--bg-tertiary);
   border-radius: 8px;
-  padding: 25px;
-  margin-bottom: 20px;
+  padding: 12px;
+  margin-bottom: 10px;
   border: 1px solid var(--border-color);
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
@@ -110,13 +109,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .variable-selectors h3 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 0.95rem;
   color: var(--text-primary);
+  font-weight: 600;
 }
 
 .var-loading {
@@ -134,20 +134,20 @@
 
 .variable-inputs {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
 }
 
 .variable-dropdown {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .variable-dropdown label {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
 .required {
@@ -156,18 +156,18 @@
 }
 
 .variable-select {
-  padding: 10px 35px 10px 12px;
-  border: 2px solid var(--border-color);
-  border-radius: 6px;
+  padding: 6px 30px 6px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
   background-color: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 10px center;
+  background-position: right 8px center;
 }
 
 .variable-select:hover {
@@ -219,9 +219,9 @@
 .plot-container {
   background-color: var(--bg-tertiary);
   border-radius: 8px;
-  padding: 25px;
+  padding: 12px;
   border: 1px solid var(--border-color);
-  margin-top: 20px;
+  margin-top: 10px;
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
