@@ -123,7 +123,6 @@ export default function RegressionVariableSelectors({
                     return (
                       <div key={varName} className="selected-variable-tag">
                         <span className="tag-name">{varName}</span>
-                        <span className="tag-info">({getVariableDescription(variable)})</span>
                         <button
                           className="tag-remove"
                           onClick={() =>
