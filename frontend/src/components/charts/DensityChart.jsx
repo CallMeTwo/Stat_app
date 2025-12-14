@@ -16,23 +16,38 @@ export function DensityChart({ data, selectedVars, groupVar }) {
 
   return (
     <ResponsiveContainer width="100%" height={600}>
-      <LineChart data={transformedData} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-        <CartesianGrid strokeDasharray="3 3" />
+      <LineChart
+        data={transformedData}
+        margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,200,200,0.2)" />
         <XAxis
           dataKey="x"
           type="number"
           label={{ value: numericVar, position: 'insideBottomRight', offset: -10 }}
+          tick={{ fontSize: 12 }}
         />
-        <YAxis label={{ value: 'Density', angle: -90, position: 'insideLeft' }} />
-        <Tooltip />
+        <YAxis
+          label={{ value: 'Density', angle: -90, position: 'insideLeft' }}
+          tick={{ fontSize: 12 }}
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid #ccc',
+            borderRadius: '4px'
+          }}
+          formatter={(value) => value ? value.toFixed(4) : 'N/A'}
+        />
         {groups ? (
           <>
-            <Legend />
+            <Legend wrapperStyle={{ paddingTop: '20px' }} />
             {groups.map((group, idx) => (
               <Line
                 key={`line-${group}`}
                 dataKey={`density_${group}`}
                 stroke={getColor(idx)}
+                strokeWidth={2}
                 dot={false}
                 isAnimationActive={false}
                 name={group}
@@ -40,7 +55,14 @@ export function DensityChart({ data, selectedVars, groupVar }) {
             ))}
           </>
         ) : (
-          <Line key="line-density" dataKey="density" stroke="#8884d8" dot={false} isAnimationActive={false} />
+          <Line
+            key="line-density"
+            dataKey="density"
+            stroke="#8884d8"
+            strokeWidth={2}
+            dot={false}
+            isAnimationActive={false}
+          />
         )}
       </LineChart>
     </ResponsiveContainer>

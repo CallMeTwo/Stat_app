@@ -12,31 +12,43 @@ export function MeanCIChart({ data, selectedVars, groupVar }) {
 
   return (
     <ResponsiveContainer width="100%" height={600}>
-      <BarChart data={transformedData} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-        <CartesianGrid strokeDasharray="3 3" />
+      <BarChart
+        data={transformedData}
+        margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,200,200,0.2)" />
         <XAxis
           dataKey={groupVar ? 'group' : 'label'}
           angle={-45}
           textAnchor="end"
           height={100}
+          tick={{ fontSize: 12 }}
+          label={{ value: groupVar || 'Overall', position: 'insideBottomRight', offset: -10 }}
         />
-        <YAxis label={{ value: numericVar, angle: -90, position: 'insideLeft' }} />
+        <YAxis
+          label={{ value: numericVar, angle: -90, position: 'insideLeft' }}
+          tick={{ fontSize: 12 }}
+        />
         <Tooltip
           content={({ active, payload }) => {
             if (active && payload && payload[0]) {
               const data = payload[0].payload
               return (
                 <div className="custom-tooltip">
-                  <p>{`Mean: ${data.mean.toFixed(2)}`}</p>
-                  <p>{`95% CI: [${data.ciLow.toFixed(2)}, ${data.ciHigh.toFixed(2)}]`}</p>
-                  <p>{`N: ${data.n}`}</p>
+                  <p><strong>Mean ± 95% CI</strong></p>
+                  <p style={{ marginTop: '8px' }}>Mean: <strong>{data.mean.toFixed(2)}</strong></p>
+                  <p>95% CI: <strong>[{data.ciLow.toFixed(2)}, {data.ciHigh.toFixed(2)}]</strong></p>
+                  <p style={{ marginTop: '8px', fontSize: '0.85rem', opacity: 0.8 }}>
+                    N = {data.n}
+                  </p>
                 </div>
               )
             }
             return null
           }}
+          cursor={{ fill: 'rgba(0,0,0,0.1)' }}
         />
-        <Bar dataKey="mean" fill="#8884d8" name="Mean">
+        <Bar dataKey="mean" fill="#8884d8" name="Mean" radius={[4, 4, 0, 0]}>
           <ErrorBar
             dataKey="ciRange"
             width={4}

@@ -15,22 +15,34 @@ export function ScatterChartComponent({ data, selectedVars, colorVar }) {
 
   return (
     <ResponsiveContainer width="100%" height={600}>
-      <ScatterChart margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-        <CartesianGrid strokeDasharray="3 3" />
+      <ScatterChart
+        margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,200,200,0.2)" />
         <XAxis
           dataKey="x"
           type="number"
           label={{ value: xVar, position: 'insideBottomRight', offset: -10 }}
+          tick={{ fontSize: 12 }}
         />
         <YAxis
           dataKey="y"
           type="number"
           label={{ value: yVar, angle: -90, position: 'insideLeft' }}
+          tick={{ fontSize: 12 }}
         />
-        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid #ccc',
+            borderRadius: '4px'
+          }}
+          cursor={{ strokeDasharray: '3 3' }}
+          formatter={(value) => value ? value.toFixed(2) : 'N/A'}
+        />
         {colors ? (
           <>
-            <Legend />
+            <Legend wrapperStyle={{ paddingTop: '20px' }} />
             {colors.map((color, idx) => (
               <Scatter
                 key={color}
@@ -41,7 +53,11 @@ export function ScatterChartComponent({ data, selectedVars, colorVar }) {
             ))}
           </>
         ) : (
-          <Scatter name={`${xVar} vs ${yVar}`} data={transformedData} fill="#8884d8" />
+          <Scatter
+            name={`${xVar} vs ${yVar}`}
+            data={transformedData}
+            fill="#8884d8"
+          />
         )}
       </ScatterChart>
     </ResponsiveContainer>

@@ -12,33 +12,44 @@ export function BoxChart({ data, selectedVars, groupVar }) {
 
   return (
     <ResponsiveContainer width="100%" height={600}>
-      <BarChart data={transformedData} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-        <CartesianGrid strokeDasharray="3 3" />
+      <BarChart
+        data={transformedData}
+        margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,200,200,0.2)" />
         <XAxis
           dataKey={groupVar ? 'group' : 'label'}
           angle={-45}
           textAnchor="end"
           height={100}
+          tick={{ fontSize: 12 }}
+          label={{ value: groupVar || numericVar, position: 'insideBottomRight', offset: -10 }}
         />
-        <YAxis label={{ value: numericVar, angle: -90, position: 'insideLeft' }} />
+        <YAxis
+          label={{ value: numericVar, angle: -90, position: 'insideLeft' }}
+          tick={{ fontSize: 12 }}
+        />
         <Tooltip
           content={({ active, payload }) => {
             if (active && payload && payload[0]) {
               const data = payload[0].payload
               return (
                 <div className="custom-tooltip">
-                  <p>{`Q1: ${data.q1.toFixed(2)}`}</p>
-                  <p>{`Median: ${data.q2.toFixed(2)}`}</p>
-                  <p>{`Q3: ${data.q3.toFixed(2)}`}</p>
-                  <p>{`Min: ${data.min.toFixed(2)}`}</p>
-                  <p>{`Max: ${data.max.toFixed(2)}`}</p>
+                  <p><strong>{data.group || 'Data'}</strong></p>
+                  <p style={{ marginTop: '8px' }}>Q1: <strong>{data.q1.toFixed(2)}</strong></p>
+                  <p>Median: <strong>{data.q2.toFixed(2)}</strong></p>
+                  <p>Q3: <strong>{data.q3.toFixed(2)}</strong></p>
+                  <p style={{ marginTop: '8px', fontSize: '0.85rem', opacity: 0.8 }}>
+                    Range: [{data.min.toFixed(2)}, {data.max.toFixed(2)}]
+                  </p>
                 </div>
               )
             }
             return null
           }}
+          cursor={{ fill: 'rgba(0,0,0,0.1)' }}
         />
-        <Bar dataKey="q2" fill="#8884d8" name="Median">
+        <Bar dataKey="q2" fill="#8884d8" name="Median" radius={[4, 4, 0, 0]}>
           <ErrorBar
             dataKey="errorRange"
             width={4}

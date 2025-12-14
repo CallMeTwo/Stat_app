@@ -17,19 +17,34 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
 
   return (
     <ResponsiveContainer width="100%" height={600}>
-      <BarChart data={transformedData} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-        <CartesianGrid strokeDasharray="3 3" />
+      <BarChart
+        data={transformedData}
+        margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,200,200,0.2)" />
         <XAxis
           dataKey="bin"
           angle={-45}
           textAnchor="end"
           height={100}
+          tick={{ fontSize: 12 }}
+          label={{ value: numericVar, position: 'insideBottomRight', offset: -10 }}
         />
-        <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft' }} />
-        <Tooltip />
+        <YAxis
+          label={{ value: 'Frequency', angle: -90, position: 'insideLeft' }}
+          tick={{ fontSize: 12 }}
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid #ccc',
+            borderRadius: '4px'
+          }}
+          cursor={{ fill: 'rgba(0,0,0,0.1)' }}
+        />
         {groups ? (
           <>
-            <Legend />
+            <Legend wrapperStyle={{ paddingTop: '20px' }} />
             {groups.map((group, idx) => (
               <Bar
                 key={`bar-${group}`}
@@ -37,11 +52,17 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
                 stackId="group"
                 fill={getColor(idx)}
                 name={group}
+                radius={[4, 4, 0, 0]}
               />
             ))}
           </>
         ) : (
-          <Bar key="bar-count" dataKey="count" fill="#8884d8" />
+          <Bar
+            key="bar-count"
+            dataKey="count"
+            fill="#8884d8"
+            radius={[4, 4, 0, 0]}
+          />
         )}
       </BarChart>
     </ResponsiveContainer>
