@@ -1,10 +1,16 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
-export function BarChartComponent({ data, selectedVars, stackVar }) {
+export function BarChartComponent({
+  data,
+  selectedVars,
+  stackVar,
+  displayMode = 'stack',
+  valueType = 'count'
+}) {
   if (!data || data.length === 0) return <div className="no-data">No data available</div>
 
   const categoricalVar = selectedVars.categorical
-  const transformedData = transformBarData(data, categoricalVar, stackVar)
+  const transformedData = transformBarData(data, categoricalVar, stackVar, valueType)
 
   if (!transformedData || transformedData.length === 0) {
     return <div className="no-data">No valid data for bar plot</div>
@@ -14,6 +20,8 @@ export function BarChartComponent({ data, selectedVars, stackVar }) {
   const stackGroups = stackVar
     ? [...new Set(data.map(row => row[stackVar]).filter(v => v != null))]
     : null
+
+  const yAxisLabel = valueType === 'percentage' ? 'Percentage (%)' : 'Frequency'
 
   return (
     <ResponsiveContainer width="100%" height={600}>
@@ -31,7 +39,7 @@ export function BarChartComponent({ data, selectedVars, stackVar }) {
           label={{ value: categoricalVar, position: 'insideBottomRight', offset: -10 }}
         />
         <YAxis
-          label={{ value: 'Frequency', angle: -90, position: 'insideLeft' }}
+          label={{ value: yAxisLabel, angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
         />
         <Tooltip
@@ -45,21 +53,24 @@ export function BarChartComponent({ data, selectedVars, stackVar }) {
         {stackGroups ? (
           <>
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
-            {stackGroups.map((group, idx) => (
-              <Bar
-                key={`bar-${group}`}
-                dataKey={`count_${group}`}
-                stackId="stack"
-                fill={getColor(idx)}
-                name={group}
-                radius={[4, 4, 0, 0]}
-              />
-            ))}
+            {stackGroups.map((group, idx) => {
+              const dataKey = valueType === 'percentage' ? `percent_${group}` : `count_${group}`
+              return (
+                <Bar
+                  key={`bar-${group}`}
+                  dataKey={dataKey}
+                  stackId={displayMode === 'stack' ? 'stack' : undefined}
+                  fill={getColor(idx)}
+                  name={group}
+                  radius={[4, 4, 0, 0]}
+                />
+              )
+            })}
           </>
         ) : (
           <Bar
             key="bar-count"
-            dataKey="count"
+            dataKey={valueType === 'percentage' ? 'percent' : 'count'}
             fill="#8884d8"
             radius={[4, 4, 0, 0]}
           />
@@ -69,7 +80,7 @@ export function BarChartComponent({ data, selectedVars, stackVar }) {
   )
 }
 
-export function transformBarData(data, categoricalVar, stackVar) {
+export function transformBarData(data, categoricalVar, stackVar, valueType = 'count') {
   if (!data || data.length === 0 || !categoricalVar) return []
 
   // Get unique categories
@@ -77,10 +88,20 @@ export function transformBarData(data, categoricalVar, stackVar) {
 
   if (!stackVar) {
     // Simple bar plot: count frequencies per category
-    return categories.map(category => ({
+    const result = categories.map(category => ({
       category,
       count: data.filter(row => row[categoricalVar] === category).length,
     }))
+
+    // Add percentages if needed
+    if (valueType === 'percentage') {
+      const total = result.reduce((sum, item) => sum + item.count, 0)
+      result.forEach(item => {
+        item.percent = total > 0 ? (item.count / total) * 100 : 0
+      })
+    }
+
+    return result
   } else {
     // Stacked bar plot
     const stackedData = categories.map(category => {
@@ -98,6 +119,25 @@ export function transformBarData(data, categoricalVar, stackVar) {
 
       return barData
     })
+
+    // Add percentages if needed
+    if (valueType === 'percentage') {
+      stackedData.forEach(categoryData => {
+        // Calculate total for this category
+        const total = Object.keys(categoryData)
+          .filter(key => key.startsWith('count_'))
+          .reduce((sum, key) => sum + categoryData[key], 0)
+
+        // Convert counts to percentages
+        Object.keys(categoryData)
+          .filter(key => key.startsWith('count_'))
+          .forEach(key => {
+            const stackGroup = key.replace('count_', '')
+            const count = categoryData[key]
+            categoryData[`percent_${stackGroup}`] = total > 0 ? (count / total) * 100 : 0
+          })
+      })
+    }
 
     return stackedData
   }

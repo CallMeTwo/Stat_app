@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ErrorBar } from 'recharts'
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ErrorBar } from 'recharts'
 
 export function MeanCIChart({ data, selectedVars, groupVar }) {
   if (!data || data.length === 0) return <div className="no-data">No data available</div>
@@ -12,12 +12,13 @@ export function MeanCIChart({ data, selectedVars, groupVar }) {
 
   return (
     <ResponsiveContainer width="100%" height={600}>
-      <BarChart
+      <ScatterChart
         data={transformedData}
-        margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
+        margin={{ top: 20, right: 30, left: 60, bottom: 80 }}
       >
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,200,200,0.2)" />
         <XAxis
+          type="category"
           dataKey={groupVar ? 'group' : 'label'}
           angle={-45}
           textAnchor="end"
@@ -26,6 +27,7 @@ export function MeanCIChart({ data, selectedVars, groupVar }) {
           label={{ value: groupVar || 'Overall', position: 'insideBottomRight', offset: -10 }}
         />
         <YAxis
+          type="number"
           label={{ value: numericVar, angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
         />
@@ -48,15 +50,15 @@ export function MeanCIChart({ data, selectedVars, groupVar }) {
           }}
           cursor={{ fill: 'rgba(0,0,0,0.1)' }}
         />
-        <Bar dataKey="mean" fill="#8884d8" name="Mean" radius={[4, 4, 0, 0]}>
+        <Scatter dataKey="mean" fill="#8884d8" name="Mean">
           <ErrorBar
             dataKey="ciRange"
             width={4}
             strokeWidth={2}
             stroke="#666"
           />
-        </Bar>
-      </BarChart>
+        </Scatter>
+      </ScatterChart>
     </ResponsiveContainer>
   )
 }

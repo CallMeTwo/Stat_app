@@ -15,11 +15,22 @@ export default function Visualization({ fileId, variableAnalysis }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [dataLoaded, setDataLoaded] = useState(false)
+  const [barPlotSettings, setBarPlotSettings] = useState({
+    displayMode: 'stack',
+    valueType: 'count'
+  })
 
   // Reset selected variables when plot type changes
   useEffect(() => {
     setSelectedVars({})
     setError(null)
+    // Reset bar plot settings when plot type changes
+    if (plotType !== 'barplot') {
+      setBarPlotSettings({
+        displayMode: 'stack',
+        valueType: 'count'
+      })
+    }
   }, [plotType])
 
   // Load raw data once when component mounts
@@ -99,7 +110,14 @@ export default function Visualization({ fileId, variableAnalysis }) {
       case 'mean_ci':
         return <MeanCIChart {...commonProps} groupVar={selectedVars.categorical} />
       case 'barplot':
-        return <BarChartComponent {...commonProps} stackVar={selectedVars.stack_var} />
+        return (
+          <BarChartComponent
+            {...commonProps}
+            stackVar={selectedVars.stack_var}
+            displayMode={barPlotSettings.displayMode}
+            valueType={barPlotSettings.valueType}
+          />
+        )
       case 'scatter':
         return <ScatterChartComponent {...commonProps} colorVar={selectedVars.color_var} />
       default:
@@ -126,13 +144,26 @@ export default function Visualization({ fileId, variableAnalysis }) {
           />
 
           {plotType && (
-            <VariableSelectors
-              plotType={plotType}
-              selectedVars={selectedVars}
-              numericVars={numericVars}
-              categoricalVars={categoricalVars}
-              onChange={handleVariableChange}
-            />
+            <>
+              <VariableSelectors
+                plotType={plotType}
+                selectedVars={selectedVars}
+                numericVars={numericVars}
+                categoricalVars={categoricalVars}
+                onChange={handleVariableChange}
+              />
+              {plotType === 'barplot' && (
+                <BarPlotSettings
+                  settings={barPlotSettings}
+                  onChange={(key, value) =>
+                    setBarPlotSettings(prev => ({
+                      ...prev,
+                      [key]: value
+                    }))
+                  }
+                />
+              )}
+            </>
           )}
 
           {error && (
@@ -249,6 +280,63 @@ function VariableDropdown({ label, options, value, onChange, required }) {
           </option>
         ))}
       </select>
+    </div>
+  )
+}
+
+function BarPlotSettings({ settings, onChange }) {
+  return (
+    <div className="bar-plot-settings">
+      <h3>Bar Plot Settings</h3>
+      <div className="settings-grid">
+        <div className="setting-group">
+          <label>Display Mode</label>
+          <div className="radio-group">
+            <label>
+              <input
+                type="radio"
+                value="stack"
+                checked={settings.displayMode === 'stack'}
+                onChange={(e) => onChange('displayMode', e.target.value)}
+              />
+              Stacked
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="cluster"
+                checked={settings.displayMode === 'cluster'}
+                onChange={(e) => onChange('displayMode', e.target.value)}
+              />
+              Clustered
+            </label>
+          </div>
+        </div>
+
+        <div className="setting-group">
+          <label>Value Type</label>
+          <div className="radio-group">
+            <label>
+              <input
+                type="radio"
+                value="count"
+                checked={settings.valueType === 'count'}
+                onChange={(e) => onChange('valueType', e.target.value)}
+              />
+              Count
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="percentage"
+                checked={settings.valueType === 'percentage'}
+                onChange={(e) => onChange('valueType', e.target.value)}
+              />
+              Percentage
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
