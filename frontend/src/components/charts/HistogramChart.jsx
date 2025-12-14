@@ -1,4 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { getYAxisDomain } from './axisUtils'
 
 export function HistogramChart({ data, selectedVars, groupVar }) {
   if (!data || data.length === 0) return <div className="no-data">No data available</div>
@@ -14,6 +15,12 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
   const groups = groupVar
     ? [...new Set(data.map(row => row[groupVar]).filter(v => v != null))]
     : null
+
+  // Calculate Y-axis domain based on data
+  const countKeys = groups
+    ? groups.map(g => `count_${g}`)
+    : ['count']
+  const yAxisDomain = getYAxisDomain(transformedData, countKeys)
 
   return (
     <ResponsiveContainer width="100%" height={600}>
@@ -33,6 +40,7 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
         <YAxis
           label={{ value: 'Frequency', angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
+          domain={yAxisDomain}
         />
         <Tooltip
           contentStyle={{

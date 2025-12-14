@@ -1,4 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { getYAxisDomain } from './axisUtils'
 
 export function DensityChart({ data, selectedVars, groupVar }) {
   if (!data || data.length === 0) return <div className="no-data">No data available</div>
@@ -13,6 +14,12 @@ export function DensityChart({ data, selectedVars, groupVar }) {
   const groups = groupVar
     ? [...new Set(data.map(row => row[groupVar]).filter(v => v != null))]
     : null
+
+  // Calculate Y-axis domain based on density values
+  const densityKeys = groups
+    ? groups.map(g => `density_${g}`)
+    : ['density']
+  const yAxisDomain = getYAxisDomain(transformedData, densityKeys)
 
   return (
     <ResponsiveContainer width="100%" height={600}>
@@ -30,6 +37,7 @@ export function DensityChart({ data, selectedVars, groupVar }) {
         <YAxis
           label={{ value: 'Density', angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
+          domain={yAxisDomain}
         />
         <Tooltip
           contentStyle={{

@@ -1,4 +1,5 @@
 import { ComposedChart, Bar, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { getYAxisDomain } from './axisUtils'
 
 // Custom shape for horizontal lines (whisker ends)
 const HorizonBar = (props) => {
@@ -87,7 +88,7 @@ export function BoxChart({ data, selectedVars, groupVar }) {
         <YAxis
           label={{ value: numericVar, angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
-          domain={['auto', 'auto']}
+          domain={getYAxisDomain(transformedData, ['whiskerLow', 'whiskerHigh'])}
         />
         <Tooltip
           content={({ active, payload }) => {
