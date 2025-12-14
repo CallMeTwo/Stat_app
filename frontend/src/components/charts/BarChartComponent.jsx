@@ -10,8 +10,10 @@ export function BarChartComponent({ data, selectedVars, stackVar }) {
     return <div className="no-data">No valid data for bar plot</div>
   }
 
-  // Get stack groups if stacking
-  const stackGroups = stackVar ? [...new Set(transformedData.map(d => d.stackGroup))] : null
+  // Get stack groups from raw data
+  const stackGroups = stackVar
+    ? [...new Set(data.map(row => row[stackVar]).filter(v => v != null))]
+    : null
 
   return (
     <ResponsiveContainer width="100%" height={600}>

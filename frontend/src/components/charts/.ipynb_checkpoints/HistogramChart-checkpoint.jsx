@@ -10,10 +10,8 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
     return <div className="no-data">No valid data for histogram</div>
   }
 
-  // Get unique groups from raw data
-  const groups = groupVar
-    ? [...new Set(data.map(row => row[groupVar]).filter(v => v != null))]
-    : null
+  // Get unique groups for dynamic bars
+  const groups = groupVar ? [...new Set(transformedData.map(d => d.group))] : null
 
   return (
     <ResponsiveContainer width="100%" height={600}>

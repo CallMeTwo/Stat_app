@@ -11,7 +11,7 @@ export function ScatterChartComponent({ data, selectedVars, colorVar }) {
     return <div className="no-data">No valid data for scatter plot</div>
   }
 
-  const colors = colorVar ? [...new Set(transformedData.map(d => d.group))] : null
+  const colors = colorVar ? [...new Set(data.map(row => row[colorVar]).filter(v => v != null))] : null
 
   return (
     <ResponsiveContainer width="100%" height={600}>
