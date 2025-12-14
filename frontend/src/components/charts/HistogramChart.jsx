@@ -93,10 +93,16 @@ export function transformHistogramData(data, numericVar, groupVar) {
   const q1 = percentile(values, 0.25)
   const q3 = percentile(values, 0.75)
   const iqr = q3 - q1
-  const binWidth = iqr === 0 ? 1 : Math.max(1, Math.ceil(2 * iqr / Math.pow(values.length, 1 / 3)))
+  let binWidth = iqr === 0 ? 1 : Math.max(1, Math.ceil(2 * iqr / Math.pow(values.length, 1 / 3)))
 
   // Create bins
-  const numBins = Math.ceil(range / binWidth)
+  let numBins = Math.ceil(range / binWidth)
+  // Ensure at least 10 bins for better visualization
+  if (numBins < 10) {
+    numBins = 10
+    binWidth = range / numBins
+  }
+
   const bins = []
 
   for (let i = 0; i < numBins; i++) {
