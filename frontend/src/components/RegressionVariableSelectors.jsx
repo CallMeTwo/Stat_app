@@ -47,7 +47,6 @@ export default function RegressionVariableSelectors({
         {/* Dependent Variable */}
         {dependentReq && (
           <div className="variable-section">
-            <h4>Dependent Variable</h4>
             <div className="variable-dropdown">
               <label>
                 {dependentReq.label}
@@ -88,7 +87,6 @@ export default function RegressionVariableSelectors({
         {/* Independent Variables */}
         {independentReq && (
           <div className="variable-section">
-            <h4>Independent Variables</h4>
             <div className="variable-multi-select">
               <label>
                 {independentReq.label}
