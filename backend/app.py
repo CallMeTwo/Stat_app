@@ -1295,6 +1295,31 @@ async def get_visualization_data(file_id: str, request_data: dict = Body(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ==================== RAW DATA ENDPOINT ====================
+
+@app.get("/api/data/{file_id}")
+async def get_raw_data(file_id: str):
+    """Get raw dataframe as JSON for client-side visualization with Recharts"""
+    try:
+        if file_id not in uploaded_files:
+            raise HTTPException(status_code=404, detail="File not found")
+
+        df = uploaded_files[file_id]['dataframe']
+
+        # Convert dataframe to list of dicts (JSON serializable)
+        data = df.to_dict('records')
+
+        return {
+            "file_id": file_id,
+            "data": data,
+            "rows": len(data),
+            "columns": list(df.columns)
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ==================== STATIC FILE SERVING ====================
 
 @app.get("/favicon.ico")

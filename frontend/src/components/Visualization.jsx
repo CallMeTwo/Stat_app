@@ -1,30 +1,51 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import api from '../services/api'
+import { HistogramChart } from './charts/HistogramChart'
+import { BoxChart } from './charts/BoxChart'
+import { DensityChart } from './charts/DensityChart'
+import { MeanCIChart } from './charts/MeanCIChart'
+import { BarChartComponent } from './charts/BarChartComponent'
+import { ScatterChartComponent } from './charts/ScatterChart'
 import './Visualization.css'
-
-const Plot = lazy(() => import('react-plotly.js'))
-
-// Trigger Plot loading when this file is imported
-if (typeof window !== 'undefined') {
-  // Preload Plot component in background
-  import('react-plotly.js').catch(err => console.error('Failed to preload Plot:', err))
-}
 
 export default function Visualization({ fileId, variableAnalysis }) {
   const [plotType, setPlotType] = useState('')
   const [selectedVars, setSelectedVars] = useState({})
-  const [plotData, setPlotData] = useState([])
-  const [plotLayout, setPlotLayout] = useState({})
+  const [rawData, setRawData] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [dataLoaded, setDataLoaded] = useState(false)
 
   // Reset selected variables when plot type changes
   useEffect(() => {
     setSelectedVars({})
-    setPlotData([])
-    setPlotLayout({})
     setError(null)
   }, [plotType])
+
+  // Load raw data once when component mounts
+  useEffect(() => {
+    if (!dataLoaded && fileId) {
+      fetchRawData()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fileId, dataLoaded])
+
+  const fetchRawData = async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await api.get(`/api/data/${fileId}`)
+      setRawData(response.data.data || [])
+      setDataLoaded(true)
+    } catch (err) {
+      const errorMessage = err.response?.data?.detail || err.message || 'Failed to load data'
+      setError(errorMessage)
+      console.error('Error loading raw data:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Get variables by type
   const numericVars = variableAnalysis?.filter(v => v.currentType === 'numeric') || []
@@ -42,13 +63,12 @@ export default function Visualization({ fileId, variableAnalysis }) {
   }
 
   // Check if all required variables are selected
-  const canGeneratePlot = () => {
-    if (!plotType) return false
+  const canRenderPlot = () => {
+    if (!plotType || !rawData || rawData.length === 0) return false
 
     switch (plotType) {
       case 'histogram':
       case 'boxplot':
-      case 'violin':
       case 'density':
       case 'mean_ci':
         return selectedVars.numeric
@@ -61,34 +81,31 @@ export default function Visualization({ fileId, variableAnalysis }) {
     }
   }
 
-  const handleGeneratePlot = async () => {
-    setLoading(true)
-    setError(null)
+  const renderChart = () => {
+    if (!canRenderPlot()) return null
 
-    try {
-      const response = await api.post(`/api/visualize/${fileId}`, {
-        plot_type: plotType,
-        variables: selectedVars
-      })
+    const commonProps = {
+      data: rawData,
+      selectedVars,
+    }
 
-      setPlotData(response.data.plotly_data)
-      setPlotLayout(response.data.plotly_layout)
-    } catch (err) {
-      const errorMessage = err.response?.data?.detail || err.message || 'Failed to generate plot'
-      setError(errorMessage)
-      console.error('Error generating plot:', err)
-    } finally {
-      setLoading(false)
+    switch (plotType) {
+      case 'histogram':
+        return <HistogramChart {...commonProps} groupVar={selectedVars.categorical} />
+      case 'boxplot':
+        return <BoxChart {...commonProps} groupVar={selectedVars.categorical} />
+      case 'density':
+        return <DensityChart {...commonProps} groupVar={selectedVars.categorical} />
+      case 'mean_ci':
+        return <MeanCIChart {...commonProps} groupVar={selectedVars.categorical} />
+      case 'barplot':
+        return <BarChartComponent {...commonProps} stackVar={selectedVars.stack_var} />
+      case 'scatter':
+        return <ScatterChartComponent {...commonProps} colorVar={selectedVars.color_var} />
+      default:
+        return null
     }
   }
-
-  // Auto-generate plot when variables change and are sufficient
-  useEffect(() => {
-    if (canGeneratePlot()) {
-      handleGeneratePlot()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedVars, plotType])
 
   return (
     <div className="visualization">
@@ -101,6 +118,8 @@ export default function Visualization({ fileId, variableAnalysis }) {
         <p className="no-data">Please upload a file first to create visualizations.</p>
       ) : (
         <>
+          {loading && <p className="loading-message">Loading data...</p>}
+
           <PlotTypeSelector
             selectedType={plotType}
             onSelect={handlePlotTypeSelect}
@@ -113,7 +132,6 @@ export default function Visualization({ fileId, variableAnalysis }) {
               numericVars={numericVars}
               categoricalVars={categoricalVars}
               onChange={handleVariableChange}
-              loading={loading}
             />
           )}
 
@@ -123,27 +141,9 @@ export default function Visualization({ fileId, variableAnalysis }) {
             </div>
           )}
 
-          {plotData.length > 0 && (
+          {canRenderPlot() && (
             <div className="plot-container">
-              <Suspense fallback={<div className="loading-message">Loading plot engine, this might take sometime for the first plot</div>}>
-                <Plot
-                  data={plotData}
-                  layout={{
-                    ...plotLayout,
-                    autosize: true,
-                    paper_bgcolor: 'rgba(0,0,0,0)',
-                    plot_bgcolor: 'rgba(0,0,0,0)',
-                  }}
-                  config={{
-                    responsive: true,
-                    displayModeBar: true,
-                    displaylogo: false,
-                    modeBarButtonsToRemove: ['lasso2d', 'select2d'],
-                  }}
-                  useResizeHandler={true}
-                  style={{ width: '100%', height: '600px' }}
-                />
-              </Suspense>
+              {renderChart()}
             </div>
           )}
         </>
@@ -156,7 +156,6 @@ function PlotTypeSelector({ selectedType, onSelect }) {
   const plotTypes = [
     { id: 'histogram', name: 'Histogram', icon: '📊' },
     { id: 'boxplot', name: 'Box Plot', icon: '📦' },
-    { id: 'violin', name: 'Violin Plot', icon: '🎻' },
     { id: 'density', name: 'Density Plot', icon: '〰️' },
     { id: 'mean_ci', name: 'Mean ± CI', icon: '📈' },
     { id: 'barplot', name: 'Bar Plot', icon: '📋' },
@@ -182,12 +181,11 @@ function PlotTypeSelector({ selectedType, onSelect }) {
   )
 }
 
-function VariableSelectors({ plotType, selectedVars, numericVars, categoricalVars, onChange, loading }) {
+function VariableSelectors({ plotType, selectedVars, numericVars, categoricalVars, onChange }) {
   const getVariableConfig = () => {
     switch (plotType) {
       case 'histogram':
       case 'boxplot':
-      case 'violin':
       case 'density':
       case 'mean_ci':
         return [
@@ -216,7 +214,6 @@ function VariableSelectors({ plotType, selectedVars, numericVars, categoricalVar
     <div className="variable-selectors">
       <div className="variable-selectors-header">
         <h3>Configure Variables</h3>
-        {loading && <span className="var-loading">Generating plot...</span>}
       </div>
       <div className="variable-inputs">
         {config.map(item => (
