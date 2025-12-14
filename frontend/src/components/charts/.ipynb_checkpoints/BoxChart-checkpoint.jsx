@@ -1,4 +1,4 @@
-import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ErrorBar } from 'recharts'
 
 export function BoxChart({ data, selectedVars, groupVar }) {
   if (!data || data.length === 0) return <div className="no-data">No data available</div>
@@ -12,7 +12,7 @@ export function BoxChart({ data, selectedVars, groupVar }) {
 
   return (
     <ResponsiveContainer width="100%" height={600}>
-      <ComposedChart
+      <BarChart
         data={transformedData}
         margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
       >
@@ -36,11 +36,12 @@ export function BoxChart({ data, selectedVars, groupVar }) {
               return (
                 <div className="custom-tooltip">
                   <p><strong>{data.group || 'Data'}</strong></p>
-                  <p style={{ marginTop: '8px' }}>Min: <strong>{data.min.toFixed(2)}</strong></p>
-                  <p>Q1: <strong>{data.q1.toFixed(2)}</strong></p>
+                  <p style={{ marginTop: '8px' }}>Q1: <strong>{data.q1.toFixed(2)}</strong></p>
                   <p>Median: <strong>{data.q2.toFixed(2)}</strong></p>
                   <p>Q3: <strong>{data.q3.toFixed(2)}</strong></p>
-                  <p>Max: <strong>{data.max.toFixed(2)}</strong></p>
+                  <p style={{ marginTop: '8px', fontSize: '0.85rem', opacity: 0.8 }}>
+                    Range: [{data.min.toFixed(2)}, {data.max.toFixed(2)}]
+                  </p>
                 </div>
               )
             }
@@ -48,46 +49,15 @@ export function BoxChart({ data, selectedVars, groupVar }) {
           }}
           cursor={{ fill: 'rgba(0,0,0,0.1)' }}
         />
-        <Legend wrapperStyle={{ paddingTop: '20px' }} />
-
-        {/* Whisker lines (lower and upper) */}
-        <Line
-          dataKey="min"
-          stroke="#666"
-          strokeWidth={1}
-          dot={false}
-          isAnimationActive={false}
-          name="Whisker"
-        />
-        <Line
-          dataKey="max"
-          stroke="#666"
-          strokeWidth={1}
-          dot={false}
-          isAnimationActive={false}
-          name="Whisker"
-        />
-
-        {/* Box: from Q1 to Q3 */}
-        <Bar
-          dataKey="boxHeight"
-          stackId="box"
-          fill="#8884d8"
-          opacity={0.7}
-          name="IQR (Q1-Q3)"
-          radius={[2, 2, 2, 2]}
-        />
-
-        {/* Median line (on top of box) */}
-        <Line
-          dataKey="q2"
-          stroke="#d32f2f"
-          strokeWidth={2}
-          dot={false}
-          isAnimationActive={false}
-          name="Median"
-        />
-      </ComposedChart>
+        <Bar dataKey="q2" fill="#8884d8" name="Median" radius={[4, 4, 0, 0]}>
+          <ErrorBar
+            dataKey="errorRange"
+            width={4}
+            strokeWidth={2}
+            stroke="#666"
+          />
+        </Bar>
+      </BarChart>
     </ResponsiveContainer>
   )
 }
@@ -108,7 +78,7 @@ export function transformBoxPlotData(data, numericVar, groupVar) {
     return [{
       label: numericVar,
       ...stats,
-      boxHeight: stats.q3 - stats.q1, // Height of the box (IQR)
+      errorRange: [stats.q1, stats.q3],
     }]
   } else {
     // Multiple box plots grouped
@@ -125,7 +95,7 @@ export function transformBoxPlotData(data, numericVar, groupVar) {
       return {
         group,
         ...stats,
-        boxHeight: stats.q3 - stats.q1, // Height of the box (IQR)
+        errorRange: [stats.q1, stats.q3],
       }
     }).filter(item => item !== null)
   }
