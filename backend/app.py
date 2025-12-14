@@ -874,14 +874,36 @@ async def get_raw_data(file_id: str):
 
         df = uploaded_files[file_id]['dataframe']
 
-        # Replace NaN and Inf values with None for JSON serialization
-        df_clean = df.where(pd.notna(df), None)
-        df_clean = df_clean.replace([np.inf, -np.inf], None)
+        # Create a copy and clean NaN/Inf values
+        df_clean = df.copy()
 
-        # Convert dataframe to list of dicts (JSON serializable)
-        data = df_clean.to_dict('records')
+        # For each numeric column, replace inf and nan with None
+        for col in df_clean.columns:
+            if df_clean[col].dtype in ['float64', 'float32', 'int64', 'int32']:
+                # Replace inf with None
+                df_clean[col] = df_clean[col].replace([np.inf, -np.inf], None)
+                # Replace nan with None
+                df_clean[col] = df_clean[col].where(pd.notna(df_clean[col]), None)
 
-        # Return using custom JSON encoder that handles remaining float issues
+        # Convert dataframe to list of dicts
+        data = []
+        for _, row in df_clean.iterrows():
+            record = {}
+            for col, val in row.items():
+                # Additional safety: convert numpy types to native Python types
+                if pd.isna(val):
+                    record[col] = None
+                elif isinstance(val, (np.floating, float)):
+                    if np.isnan(val) or np.isinf(val):
+                        record[col] = None
+                    else:
+                        record[col] = float(val)
+                elif isinstance(val, (np.integer, int)):
+                    record[col] = int(val)
+                else:
+                    record[col] = val
+            data.append(record)
+
         response_data = {
             "file_id": file_id,
             "data": data,
@@ -889,8 +911,10 @@ async def get_raw_data(file_id: str):
             "columns": list(df.columns)
         }
 
+        # Use json.dumps with custom encoder for safe serialization
+        json_str = json.dumps(response_data, cls=NumpyEncoder)
         return JSONResponse(
-            content=response_data,
+            content=json.loads(json_str),
             media_type="application/json"
         )
 
