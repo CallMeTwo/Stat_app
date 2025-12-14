@@ -2,27 +2,31 @@
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .regression h2 {
   font-size: 2rem;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   font-weight: 600;
 }
 
 .regression > .description {
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 2rem;
   font-size: 0.95rem;
 }
 
 .regression .no-data {
-  background-color: #f0f0f0;
+  background-color: var(--bg-tertiary);
   padding: 2rem;
   border-radius: 8px;
-  color: #666;
+  color: var(--text-secondary);
   text-align: center;
+  border: 1px solid var(--border-color);
 }
 
 /* Regression Type Selector */
@@ -32,13 +36,13 @@
 
 .selector-header h3 {
   font-size: 1.3rem;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   font-weight: 600;
 }
 
 .selector-description {
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
 }
@@ -55,9 +59,9 @@
   align-items: flex-start;
   gap: 1.5rem;
   padding: 1.5rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-color);
   border-radius: 12px;
-  background-color: #fff;
+  background-color: var(--bg-secondary);
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: left;
@@ -72,7 +76,7 @@
 
 .regression-button.selected {
   border-color: #667eea;
-  background-color: #f8f9fd;
+  background-color: var(--bg-tertiary);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
@@ -91,13 +95,13 @@
 
 .button-content h4 {
   font-size: 1.1rem;
-  color: #333;
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }
 
 .button-content p {
-  color: #666;
+  color: var(--text-secondary);
   margin: 0;
   font-size: 0.85rem;
   line-height: 1.4;
@@ -105,7 +109,7 @@
 
 /* Variable Selectors */
 .regression-variable-selectors {
-  background-color: #f9f9f9;
+  background-color: var(--bg-tertiary);
   padding: 2rem;
   border-radius: 12px;
   margin-bottom: 2rem;
@@ -113,7 +117,7 @@
 
 .variable-selectors-header h3 {
   font-size: 1.3rem;
-  color: #333;
+  color: var(--text-primary);
   margin: 0 0 1.5rem 0;
   font-weight: 600;
 }
@@ -126,7 +130,7 @@
 
 .variable-section h4 {
   font-size: 1rem;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 1rem;
   font-weight: 600;
 }
@@ -141,7 +145,7 @@
 .variable-dropdown label,
 .variable-multi-select label {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   font-size: 0.95rem;
 }
 
@@ -150,13 +154,17 @@
   margin-left: 0.25rem;
 }
 
+body.dark-mode .required {
+  color: #ff6b6b;
+}
+
 .variable-select {
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   font-family: inherit;
   font-size: 0.95rem;
-  background-color: #fff;
+  background-color: var(--bg-secondary);
   cursor: pointer;
   transition: border-color 0.2s;
 }
@@ -169,9 +177,9 @@
 
 .variable-info {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary);
   padding: 0.5rem 0;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color);
   padding-top: 0.75rem;
 }
 
@@ -191,7 +199,7 @@
   gap: 0.75rem;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color);
 }
 
 .selected-variable-tag {
@@ -262,6 +270,10 @@
   opacity: 0.6;
 }
 
+body.dark-mode .run-regression-button:disabled {
+  background-color: #555;
+}
+
 /* Error Display */
 .error {
   background-color: #fee;
@@ -277,6 +289,16 @@
   font-weight: 600;
 }
 
+body.dark-mode .error {
+  background-color: rgba(220, 53, 69, 0.2);
+  border: 1px solid rgba(220, 53, 69, 0.5);
+  color: #ff6b6b;
+}
+
+body.dark-mode .error strong {
+  color: #ff6b6b;
+}
+
 /* Loading Message */
 .loading-message {
   text-align: center;
@@ -286,29 +308,33 @@
   font-size: 1.1rem;
 }
 
+body.dark-mode .loading-message {
+  color: #a0b0ff;
+}
+
 /* Regression Results */
 .regression-results {
-  background-color: #fff;
+  background-color: var(--bg-secondary);
   padding: 2rem;
   border-radius: 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
   margin-top: 2rem;
 }
 
 .results-header {
   margin-bottom: 2rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--bg-tertiary);
   padding-bottom: 1rem;
 }
 
 .results-header h2 {
   font-size: 1.5rem;
-  color: #333;
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .results-subtitle {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   margin: 0;
 }
@@ -323,10 +349,10 @@
 
 .results-section h3 {
   font-size: 1.1rem;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 1rem;
   font-weight: 600;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--bg-tertiary);
   padding-bottom: 0.75rem;
 }
 
@@ -338,15 +364,15 @@
 }
 
 .stat-card {
-  background-color: #f9f9f9;
+  background-color: var(--bg-tertiary);
   padding: 1.5rem;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
   text-align: center;
 }
 
 .stat-label {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
@@ -356,7 +382,7 @@
 
 .stat-value {
   font-size: 1.5rem;
-  color: #333;
+  color: var(--text-primary);
   font-weight: 600;
   font-family: 'Monaco', 'Courier New', monospace;
 }
@@ -365,27 +391,27 @@
 .table-container {
   overflow-x: auto;
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
 }
 
 .coefficients-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fff;
+  background-color: var(--bg-secondary);
 }
 
 .coefficients-table thead {
-  background-color: #f5f5f5;
-  border-bottom: 2px solid #e0e0e0;
+  background-color: var(--bg-tertiary);
+  border-bottom: 2px solid var(--border-color);
 }
 
 .coefficients-table th {
   padding: 1rem;
   text-align: left;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   font-size: 0.9rem;
-  border-right: 1px solid #e0e0e0;
+  border-right: 1px solid var(--border-color);
 }
 
 .coefficients-table th:last-child {
@@ -394,9 +420,9 @@
 
 .coefficients-table td {
   padding: 0.75rem 1rem;
-  border-right: 1px solid #f0f0f0;
+  border-right: 1px solid var(--bg-tertiary);
   font-size: 0.9rem;
-  color: #333;
+  color: var(--text-primary);
   font-family: 'Monaco', 'Courier New', monospace;
 }
 
@@ -407,20 +433,20 @@
 .coefficients-table td.var-name {
   font-family: inherit;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .coefficients-table tbody tr {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bg-tertiary);
   transition: background-color 0.2s;
 }
 
 .coefficients-table tbody tr:hover {
-  background-color: #f9f9f9;
+  background-color: var(--bg-tertiary);
 }
 
 .coefficients-table tbody tr.significant {
-  background-color: #fffbf0;
+  background-color: var(--bg-secondary);
 }
 
 .coefficients-table tbody tr:last-child {
@@ -429,7 +455,7 @@
 
 .table-note {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary);
   margin-top: 0.75rem;
   font-style: italic;
 }
@@ -445,9 +471,9 @@
   display: flex;
   gap: 1rem;
   padding: 1rem;
-  background-color: #f9f9f9;
+  background-color: var(--bg-tertiary);
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
 }
 
 .assumption-result {
@@ -472,19 +498,29 @@
   color: #721c24;
 }
 
+body.dark-mode .assumption-result.passed {
+  background-color: rgba(40, 167, 69, 0.3);
+  color: #90ee90;
+}
+
+body.dark-mode .assumption-result.failed {
+  background-color: rgba(220, 53, 69, 0.3);
+  color: #ff6b6b;
+}
+
 .assumption-content {
   flex: 1;
 }
 
 .assumption-name {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 0.25rem;
 }
 
 .assumption-details {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary);
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
@@ -496,11 +532,11 @@
 
 /* Interpretation */
 .interpretation-text {
-  background-color: #f9f9f9;
+  background-color: var(--bg-tertiary);
   padding: 1rem;
   border-radius: 8px;
   border-left: 4px solid #667eea;
-  color: #333;
+  color: var(--text-primary);
   line-height: 1.6;
   margin: 0;
 }

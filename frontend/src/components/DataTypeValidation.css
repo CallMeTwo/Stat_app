@@ -38,6 +38,12 @@
   font-weight: 500;
 }
 
+body.dark-mode .error {
+  background-color: rgba(220, 53, 69, 0.2);
+  border: 1px solid rgba(220, 53, 69, 0.5);
+  color: #ff6b6b;
+}
+
 .table-container {
   overflow-x: auto;
   border: 1px solid var(--border-color);
@@ -160,6 +166,10 @@ body.dark-mode .datatype-table thead {
   font-size: 0.9rem;
 }
 
+body.dark-mode .modified-indicator {
+  color: #ffa500;
+}
+
 .missingness {
   min-width: 120px;
   font-variant-numeric: tabular-nums;
@@ -232,7 +242,7 @@ body.dark-mode .datatype-table thead {
 }
 
 body.dark-mode .help-section {
-  border-left-color: #172E5C;
+  border-left-color: #a0b0ff;
 }
 
 .help-section h3 {
@@ -262,7 +272,7 @@ body.dark-mode .help-section {
 }
 
 body.dark-mode .help-section strong {
-  color: #172E5C;
+  color: #a0b0ff;
 }
 
 .note {
