@@ -30,7 +30,7 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
             <Legend />
             {groups.map((group, idx) => (
               <Bar
-                key={group}
+                key={`bar-${group}`}
                 dataKey={`count_${group}`}
                 stackId="group"
                 fill={getColor(idx)}
@@ -39,7 +39,7 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
             ))}
           </>
         ) : (
-          <Bar dataKey="count" fill="#8884d8" />
+          <Bar key="bar-count" dataKey="count" fill="#8884d8" />
         )}
       </BarChart>
     </ResponsiveContainer>

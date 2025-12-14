@@ -30,7 +30,7 @@ export function BarChartComponent({ data, selectedVars, stackVar }) {
             <Legend />
             {stackGroups.map((group, idx) => (
               <Bar
-                key={group}
+                key={`bar-${group}`}
                 dataKey={`count_${group}`}
                 stackId="stack"
                 fill={getColor(idx)}
@@ -39,7 +39,7 @@ export function BarChartComponent({ data, selectedVars, stackVar }) {
             ))}
           </>
         ) : (
-          <Bar dataKey="count" fill="#8884d8" />
+          <Bar key="bar-count" dataKey="count" fill="#8884d8" />
         )}
       </BarChart>
     </ResponsiveContainer>

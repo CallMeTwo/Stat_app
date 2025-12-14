@@ -28,7 +28,7 @@ export function DensityChart({ data, selectedVars, groupVar }) {
             <Legend />
             {groups.map((group, idx) => (
               <Line
-                key={group}
+                key={`line-${group}`}
                 dataKey={`density_${group}`}
                 stroke={getColor(idx)}
                 dot={false}
@@ -38,7 +38,7 @@ export function DensityChart({ data, selectedVars, groupVar }) {
             ))}
           </>
         ) : (
-          <Line dataKey="density" stroke="#8884d8" dot={false} isAnimationActive={false} />
+          <Line key="line-density" dataKey="density" stroke="#8884d8" dot={false} isAnimationActive={false} />
         )}
       </LineChart>
     </ResponsiveContainer>
