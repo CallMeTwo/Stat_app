@@ -49,10 +49,10 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
               <Bar
                 key={`bar-${group}`}
                 dataKey={`count_${group}`}
-                stackId="group"
                 fill={getColor(idx)}
                 name={group}
                 radius={[4, 4, 0, 0]}
+                opacity={0.7}
               />
             ))}
           </>
@@ -62,6 +62,7 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
             dataKey="count"
             fill="#8884d8"
             radius={[4, 4, 0, 0]}
+            opacity={0.7}
           />
         )}
       </BarChart>
