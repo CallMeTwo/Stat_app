@@ -6,6 +6,7 @@ import TestResults from './TestResults'
 import './Analysis.css'
 
 // Test configuration mapping with all 10 statistical tests
+// Ordered: t-test, mann-whitney U, anova, kruskal wallis, paired t-test, wilcoxon, chi square, pearson, spearman, kendall
 const testConfigs = {
   ttest: {
     name: 't-Test (Independent)',
@@ -17,15 +18,15 @@ const testConfigs = {
     ],
     endpoint: '/api/statistical-tests/ttest'
   },
-  paired_ttest: {
-    name: 'Paired t-Test',
-    description: 'Compare means of two paired/dependent groups',
-    icon: '🔗',
+  mann_whitney: {
+    name: 'Mann-Whitney U',
+    description: 'Non-parametric alternative to t-test',
+    icon: '📉',
     requirements: [
-      { key: 'var1', type: 'numeric', label: 'First Variable', required: true },
-      { key: 'var2', type: 'numeric', label: 'Second Variable', required: true }
+      { key: 'numeric', type: 'numeric', label: 'Numeric Variable', required: true },
+      { key: 'categorical', type: 'categorical', label: 'Group Variable (Binary)', required: true, minClasses: 2, maxClasses: 2 }
     ],
-    endpoint: '/api/statistical-tests/paired-ttest'
+    endpoint: '/api/statistical-tests/mann-whitney'
   },
   anova: {
     name: 'ANOVA (One-way)',
@@ -37,15 +38,25 @@ const testConfigs = {
     ],
     endpoint: '/api/statistical-tests/anova'
   },
-  mann_whitney: {
-    name: 'Mann-Whitney U',
-    description: 'Non-parametric alternative to t-test',
-    icon: '📉',
+  kruskal_wallis: {
+    name: 'Kruskal-Wallis',
+    description: 'Non-parametric ANOVA alternative',
+    icon: '📊',
     requirements: [
       { key: 'numeric', type: 'numeric', label: 'Numeric Variable', required: true },
-      { key: 'categorical', type: 'categorical', label: 'Group Variable (Binary)', required: true, minClasses: 2, maxClasses: 2 }
+      { key: 'categorical', type: 'categorical', label: 'Group Variable', required: true }
     ],
-    endpoint: '/api/statistical-tests/mann-whitney'
+    endpoint: '/api/statistical-tests/kruskal-wallis'
+  },
+  paired_ttest: {
+    name: 'Paired t-Test',
+    description: 'Compare means of two paired/dependent groups',
+    icon: '🔗',
+    requirements: [
+      { key: 'var1', type: 'numeric', label: 'First Variable', required: true },
+      { key: 'var2', type: 'numeric', label: 'Second Variable', required: true }
+    ],
+    endpoint: '/api/statistical-tests/paired-ttest'
   },
   wilcoxon_signed_rank: {
     name: 'Wilcoxon Signed-Rank',
@@ -56,16 +67,6 @@ const testConfigs = {
       { key: 'var2', type: 'numeric', label: 'Second Variable', required: true }
     ],
     endpoint: '/api/statistical-tests/wilcoxon-signed-rank'
-  },
-  kruskal_wallis: {
-    name: 'Kruskal-Wallis',
-    description: 'Non-parametric ANOVA alternative',
-    icon: '📊',
-    requirements: [
-      { key: 'numeric', type: 'numeric', label: 'Numeric Variable', required: true },
-      { key: 'categorical', type: 'categorical', label: 'Group Variable', required: true }
-    ],
-    endpoint: '/api/statistical-tests/kruskal-wallis'
   },
   chi_square: {
     name: 'Chi-Square',
