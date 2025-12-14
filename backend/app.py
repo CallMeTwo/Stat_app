@@ -41,12 +41,14 @@ app = FastAPI(
 )
 
 # Configure CORS
-ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', 'http://localhost:5173').split(',')
-ALLOWED_ORIGINS = [origin.strip() for origin in ALLOWED_ORIGINS]
+# Allow all origins in development, restrict in production via environment variable
+ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', '*')
+if ALLOWED_ORIGINS != '*':
+    ALLOWED_ORIGINS = [origin.strip() for origin in ALLOWED_ORIGINS.split(',')]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=ALLOWED_ORIGINS if isinstance(ALLOWED_ORIGINS, list) else ['*'],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -1306,17 +1308,28 @@ async def get_raw_data(file_id: str):
 
         df = uploaded_files[file_id]['dataframe']
 
-        # Convert dataframe to list of dicts (JSON serializable)
-        data = df.to_dict('records')
+        # Replace NaN and Inf values with None for JSON serialization
+        df_clean = df.where(pd.notna(df), None)
+        df_clean = df_clean.replace([np.inf, -np.inf], None)
 
-        return {
+        # Convert dataframe to list of dicts (JSON serializable)
+        data = df_clean.to_dict('records')
+
+        # Return using custom JSON encoder that handles remaining float issues
+        response_data = {
             "file_id": file_id,
             "data": data,
             "rows": len(data),
             "columns": list(df.columns)
         }
 
+        return JSONResponse(
+            content=response_data,
+            media_type="application/json"
+        )
+
     except Exception as e:
+        logger.error(f"Error in get_raw_data: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
