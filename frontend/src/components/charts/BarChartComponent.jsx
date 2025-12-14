@@ -1,5 +1,4 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { getYAxisDomain } from './axisUtils'
 
 export function BarChartComponent({
   data,
@@ -24,12 +23,6 @@ export function BarChartComponent({
 
   const yAxisLabel = valueType === 'percentage' ? 'Percentage (%)' : 'Frequency'
 
-  // Calculate Y-axis domain based on count or percentage values
-  const countKeys = stackGroups
-    ? stackGroups.map(g => valueType === 'percentage' ? `percent_${g}` : `count_${g}`)
-    : [valueType === 'percentage' ? 'percent' : 'count']
-  const yAxisDomain = getYAxisDomain(transformedData, countKeys)
-
   return (
     <ResponsiveContainer width="100%" height={600}>
       <BarChart
@@ -48,7 +41,6 @@ export function BarChartComponent({
         <YAxis
           label={{ value: yAxisLabel, angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
-          domain={yAxisDomain}
         />
         <Tooltip
           contentStyle={{

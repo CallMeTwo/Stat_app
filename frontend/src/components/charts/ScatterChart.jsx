@@ -1,5 +1,4 @@
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { getYAxisDomain } from './axisUtils'
 
 export function ScatterChartComponent({ data, selectedVars, colorVar }) {
   if (!data || data.length === 0) return <div className="no-data">No data available</div>
@@ -14,10 +13,6 @@ export function ScatterChartComponent({ data, selectedVars, colorVar }) {
 
   const colors = colorVar ? [...new Set(data.map(row => row[colorVar]).filter(v => v != null))] : null
 
-  // Calculate axis domains based on data
-  const xAxisDomain = getYAxisDomain(transformedData, ['x'])
-  const yAxisDomain = getYAxisDomain(transformedData, ['y'])
-
   return (
     <ResponsiveContainer width="100%" height={600}>
       <ScatterChart
@@ -29,14 +24,12 @@ export function ScatterChartComponent({ data, selectedVars, colorVar }) {
           type="number"
           label={{ value: xVar, position: 'insideBottomRight', offset: -10 }}
           tick={{ fontSize: 12 }}
-          domain={xAxisDomain}
         />
         <YAxis
           dataKey="y"
           type="number"
           label={{ value: yVar, angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
-          domain={yAxisDomain}
         />
         <Tooltip
           contentStyle={{

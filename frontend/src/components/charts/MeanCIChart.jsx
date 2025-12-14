@@ -1,5 +1,4 @@
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ErrorBar } from 'recharts'
-import { getYAxisDomain } from './axisUtils'
 
 export function MeanCIChart({ data, selectedVars, groupVar }) {
   if (!data || data.length === 0) return <div className="no-data">No data available</div>
@@ -10,9 +9,6 @@ export function MeanCIChart({ data, selectedVars, groupVar }) {
   if (!transformedData || transformedData.length === 0) {
     return <div className="no-data">No valid data for mean ± CI plot</div>
   }
-
-  // Calculate Y-axis domain based on mean values with error bars
-  const yAxisDomain = getYAxisDomain(transformedData, ['mean'])
 
   return (
     <ResponsiveContainer width="100%" height={600}>
@@ -34,7 +30,6 @@ export function MeanCIChart({ data, selectedVars, groupVar }) {
           type="number"
           label={{ value: numericVar, angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
-          domain={yAxisDomain}
         />
         <Tooltip
           content={({ active, payload }) => {
