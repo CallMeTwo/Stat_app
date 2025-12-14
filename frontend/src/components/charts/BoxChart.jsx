@@ -67,9 +67,35 @@ export function BoxChart({ data, selectedVars, groupVar }) {
   // Prepare outlier data for scatter plot
   const xDataKey = groupVar ? 'group' : 'label'
   const outlierData = prepareOutlierData(transformedData, groupVar)
-  
+
+  // Debug: log data
+  if (groupVar) {
+    console.log('BoxChart grouped data:', {
+      transformedDataLength: transformedData.length,
+      transformedDataGroups: transformedData.map(d => d.group),
+      outlierDataLength: outlierData.length,
+      outlierDataGroups: [...new Set(outlierData.map(d => d[xDataKey]))]
+    })
+  }
+
+  // Calculate Y-axis domain: min - range/10 to max + range/10
+  const allValues = []
+  transformedData.forEach(item => {
+    allValues.push(item.whiskerLow, item.q1, item.q2, item.q3, item.whiskerHigh)
+    if (item.outliers && item.outliers.length > 0) {
+      allValues.push(...item.outliers)
+    }
+  })
+  const minValue = Math.min(...allValues)
+  const maxValue = Math.max(...allValues)
+  const range = maxValue - minValue
+  const yAxisDomain = [minValue - range / 10, maxValue + range / 10]
+
+  // Responsive height: 400px on mobile, 600px on desktop
+  const chartHeight = typeof window !== 'undefined' && window.innerWidth < 768 ? 400 : 600
+
   return (
-    <ResponsiveContainer width="100%" height={600}>
+    <ResponsiveContainer width="100%" height={chartHeight}>
       <ComposedChart
         data={transformedData}
         margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
@@ -87,7 +113,9 @@ export function BoxChart({ data, selectedVars, groupVar }) {
         <YAxis
           label={{ value: numericVar, angle: -90, position: 'insideLeft' }}
           tick={{ fontSize: 12 }}
-          domain={['auto', 'auto']}
+          allowDataOverflow={true}
+          domain={yAxisDomain}
+          tickFormatter={(value) => Math.round(value * 100) / 100}
         />
         <Tooltip
           content={({ active, payload }) => {
@@ -96,11 +124,11 @@ export function BoxChart({ data, selectedVars, groupVar }) {
               return (
                 <div className="custom-tooltip">
                   <p><strong>{data.group || data.label}</strong></p>
-                  <p style={{ marginTop: '8px' }}>Lower fence: <strong>{data.whiskerLow?.toFixed(2)}</strong></p>
-                  <p>Q1: <strong>{data.q1?.toFixed(2)}</strong></p>
-                  <p>Median: <strong>{data.q2?.toFixed(2)}</strong></p>
+                  <p style={{ marginTop: '8px' }}>Upper fence: <strong>{data.whiskerHigh?.toFixed(2)}</strong></p>
                   <p>Q3: <strong>{data.q3?.toFixed(2)}</strong></p>
-                  <p>Upper fence: <strong>{data.whiskerHigh?.toFixed(2)}</strong></p>
+                  <p>Median: <strong>{data.q2?.toFixed(2)}</strong></p>
+                  <p>Q1: <strong>{data.q1?.toFixed(2)}</strong></p>
+                  <p>Lower fence: <strong>{data.whiskerLow?.toFixed(2)}</strong></p>
                   {data.outliers && data.outliers.length > 0 && (
                     <p style={{ marginTop: '8px', fontSize: '0.85rem', opacity: 0.8 }}>
                       Outliers: {data.outliers.length}
@@ -206,14 +234,21 @@ function prepareOutlierData(transformedData, groupVar) {
   const xKey = groupVar ? 'group' : 'label'
 
   transformedData.forEach((item) => {
-    if (item.outliers && item.outliers.length > 0) {
-      const xValue = groupVar ? item.group : item.label
+    const xValue = groupVar ? item.group : item.label
 
+    if (item.outliers && item.outliers.length > 0) {
+      // Add outlier points for this group
       item.outliers.forEach(outlierValue => {
         scatterData.push({
           [xKey]: xValue,
           value: outlierValue
         })
+      })
+    } else {
+      // For groups without outliers, add a dummy entry with null value to maintain group presence
+      scatterData.push({
+        [xKey]: xValue,
+        value: null
       })
     }
   })

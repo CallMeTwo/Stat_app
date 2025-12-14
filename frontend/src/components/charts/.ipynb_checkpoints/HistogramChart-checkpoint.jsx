@@ -10,36 +10,60 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
     return <div className="no-data">No valid data for histogram</div>
   }
 
-  // Get unique groups for dynamic bars
-  const groups = groupVar ? [...new Set(transformedData.map(d => d.group))] : null
+  // Get unique groups from raw data
+  const groups = groupVar
+    ? [...new Set(data.map(row => row[groupVar]).filter(v => v != null))]
+    : null
 
   return (
     <ResponsiveContainer width="100%" height={600}>
-      <BarChart data={transformedData} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
-        <CartesianGrid strokeDasharray="3 3" />
+      <BarChart
+        data={transformedData}
+        margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(200,200,200,0.2)" />
         <XAxis
           dataKey="bin"
           angle={-45}
           textAnchor="end"
-          height={100}
+          height={50}
+          tick={{ fontSize: 12 }}
+          label={{ value: numericVar, position: 'insideBottomRight', offset: 0 }}
         />
-        <YAxis label={{ value: 'Frequency', angle: -90, position: 'insideLeft' }} />
-        <Tooltip />
+        <YAxis
+          label={{ value: 'Frequency', angle: -90, position: 'insideLeft' }}
+          tick={{ fontSize: 12 }}
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid #ccc',
+            borderRadius: '4px'
+          }}
+          cursor={{ fill: 'rgba(0,0,0,0.1)' }}
+        />
         {groups ? (
           <>
-            <Legend />
+            <Legend wrapperStyle={{ paddingTop: '0px' }} />
             {groups.map((group, idx) => (
               <Bar
                 key={`bar-${group}`}
                 dataKey={`count_${group}`}
-                stackId="group"
                 fill={getColor(idx)}
                 name={group}
+                radius={[4, 4, 0, 0]}
+                opacity={0.7}
               />
             ))}
           </>
         ) : (
-          <Bar key="bar-count" dataKey="count" fill="#8884d8" />
+          <Bar
+            key="bar-count"
+            dataKey="count"
+            fill="#8884d8"
+            radius={[4, 4, 0, 0]}
+            opacity={0.7}
+          />
         )}
       </BarChart>
     </ResponsiveContainer>
@@ -69,17 +93,26 @@ export function transformHistogramData(data, numericVar, groupVar) {
   const q1 = percentile(values, 0.25)
   const q3 = percentile(values, 0.75)
   const iqr = q3 - q1
-  const binWidth = iqr === 0 ? 1 : Math.max(1, Math.ceil(2 * iqr / Math.pow(values.length, 1 / 3)))
+  let binWidth = iqr === 0 ? 1 : Math.max(1, Math.ceil(2 * iqr / Math.pow(values.length, 1 / 3)))
 
   // Create bins
-  const numBins = Math.ceil(range / binWidth)
+  let numBins = Math.ceil(range / binWidth)
+  // Ensure at least 20 bins for better visualization
+  if (numBins < 20) {
+    numBins = 20
+    binWidth = range / numBins
+  }
+
   const bins = []
 
   for (let i = 0; i < numBins; i++) {
     const binStart = min + i * binWidth
     const binEnd = binStart + binWidth
+    const midpoint = (binStart + binEnd) / 2
+    // Round the midpoint: use 2 decimal places for display, but remove trailing zeros
+    const roundedMidpoint = parseFloat(midpoint.toFixed(2))
     bins.push({
-      bin: `${binStart.toFixed(2)}-${binEnd.toFixed(2)}`,
+      bin: roundedMidpoint.toString(),
       binStart,
       binEnd,
     })

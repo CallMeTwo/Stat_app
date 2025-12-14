@@ -15,8 +15,11 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
     ? [...new Set(data.map(row => row[groupVar]).filter(v => v != null))]
     : null
 
+  // Responsive height: 400px on mobile, 600px on desktop
+  const chartHeight = typeof window !== 'undefined' && window.innerWidth < 768 ? 400 : 600
+
   return (
-    <ResponsiveContainer width="100%" height={600}>
+    <ResponsiveContainer width="100%" height={chartHeight}>
       <BarChart
         data={transformedData}
         margin={{ top: 20, right: 30, left: 0, bottom: 80 }}
@@ -26,9 +29,9 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
           dataKey="bin"
           angle={-45}
           textAnchor="end"
-          height={100}
+          height={50}
           tick={{ fontSize: 12 }}
-          label={{ value: numericVar, position: 'insideBottomRight', offset: -10 }}
+          label={{ value: numericVar, position: 'insideBottomRight', offset: 0 }}
         />
         <YAxis
           label={{ value: 'Frequency', angle: -90, position: 'insideLeft' }}
@@ -44,7 +47,7 @@ export function HistogramChart({ data, selectedVars, groupVar }) {
         />
         {groups ? (
           <>
-            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+            <Legend wrapperStyle={{ paddingTop: '0px' }} />
             {groups.map((group, idx) => (
               <Bar
                 key={`bar-${group}`}
@@ -97,9 +100,9 @@ export function transformHistogramData(data, numericVar, groupVar) {
 
   // Create bins
   let numBins = Math.ceil(range / binWidth)
-  // Ensure at least 10 bins for better visualization
-  if (numBins < 10) {
-    numBins = 10
+  // Ensure at least 20 bins for better visualization
+  if (numBins < 20) {
+    numBins = 20
     binWidth = range / numBins
   }
 
@@ -108,8 +111,11 @@ export function transformHistogramData(data, numericVar, groupVar) {
   for (let i = 0; i < numBins; i++) {
     const binStart = min + i * binWidth
     const binEnd = binStart + binWidth
+    const midpoint = (binStart + binEnd) / 2
+    // Round the midpoint: use 2 decimal places for display, but remove trailing zeros
+    const roundedMidpoint = parseFloat(midpoint.toFixed(2))
     bins.push({
-      bin: `${binStart.toFixed(2)}-${binEnd.toFixed(2)}`,
+      bin: roundedMidpoint.toString(),
       binStart,
       binEnd,
     })
