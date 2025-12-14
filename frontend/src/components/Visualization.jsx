@@ -144,26 +144,23 @@ export default function Visualization({ fileId, variableAnalysis }) {
           />
 
           {plotType && (
-            <>
-              <VariableSelectors
-                plotType={plotType}
-                selectedVars={selectedVars}
-                numericVars={numericVars}
-                categoricalVars={categoricalVars}
-                onChange={handleVariableChange}
-              />
-              {plotType === 'barplot' && (
-                <BarPlotSettings
-                  settings={barPlotSettings}
-                  onChange={(key, value) =>
-                    setBarPlotSettings(prev => ({
-                      ...prev,
-                      [key]: value
-                    }))
-                  }
-                />
-              )}
-            </>
+            <VariableSelectors
+              plotType={plotType}
+              selectedVars={selectedVars}
+              numericVars={numericVars}
+              categoricalVars={categoricalVars}
+              onChange={handleVariableChange}
+              barPlotSettings={plotType === 'barplot' ? barPlotSettings : null}
+              onBarPlotSettingsChange={
+                plotType === 'barplot'
+                  ? (key, value) =>
+                      setBarPlotSettings(prev => ({
+                        ...prev,
+                        [key]: value
+                      }))
+                  : null
+              }
+            />
           )}
 
           {error && (
@@ -212,7 +209,15 @@ function PlotTypeSelector({ selectedType, onSelect }) {
   )
 }
 
-function VariableSelectors({ plotType, selectedVars, numericVars, categoricalVars, onChange }) {
+function VariableSelectors({
+  plotType,
+  selectedVars,
+  numericVars,
+  categoricalVars,
+  onChange,
+  barPlotSettings,
+  onBarPlotSettingsChange
+}) {
   const getVariableConfig = () => {
     switch (plotType) {
       case 'histogram':
@@ -257,6 +262,28 @@ function VariableSelectors({ plotType, selectedVars, numericVars, categoricalVar
             required={item.required}
           />
         ))}
+        {plotType === 'barplot' && barPlotSettings && onBarPlotSettingsChange && (
+          <>
+            <SettingDropdown
+              label="Display Mode"
+              value={barPlotSettings.displayMode}
+              options={[
+                { value: 'stack', label: 'Stacked' },
+                { value: 'cluster', label: 'Clustered' }
+              ]}
+              onChange={(value) => onBarPlotSettingsChange('displayMode', value)}
+            />
+            <SettingDropdown
+              label="Value Type"
+              value={barPlotSettings.valueType}
+              options={[
+                { value: 'count', label: 'Count' },
+                { value: 'percentage', label: 'Percentage' }
+              ]}
+              onChange={(value) => onBarPlotSettingsChange('valueType', value)}
+            />
+          </>
+        )}
       </div>
     </div>
   )
@@ -284,59 +311,21 @@ function VariableDropdown({ label, options, value, onChange, required }) {
   )
 }
 
-function BarPlotSettings({ settings, onChange }) {
+function SettingDropdown({ label, options, value, onChange }) {
   return (
-    <div className="bar-plot-settings">
-      <h3>Bar Plot Settings</h3>
-      <div className="settings-grid">
-        <div className="setting-group">
-          <label>Display Mode</label>
-          <div className="radio-group">
-            <label>
-              <input
-                type="radio"
-                value="stack"
-                checked={settings.displayMode === 'stack'}
-                onChange={(e) => onChange('displayMode', e.target.value)}
-              />
-              Stacked
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="cluster"
-                checked={settings.displayMode === 'cluster'}
-                onChange={(e) => onChange('displayMode', e.target.value)}
-              />
-              Clustered
-            </label>
-          </div>
-        </div>
-
-        <div className="setting-group">
-          <label>Value Type</label>
-          <div className="radio-group">
-            <label>
-              <input
-                type="radio"
-                value="count"
-                checked={settings.valueType === 'count'}
-                onChange={(e) => onChange('valueType', e.target.value)}
-              />
-              Count
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="percentage"
-                checked={settings.valueType === 'percentage'}
-                onChange={(e) => onChange('valueType', e.target.value)}
-              />
-              Percentage
-            </label>
-          </div>
-        </div>
-      </div>
+    <div className="variable-dropdown">
+      <label>{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="variable-select"
+      >
+        {options.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }
