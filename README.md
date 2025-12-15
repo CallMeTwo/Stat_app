@@ -16,7 +16,7 @@ A full-stack web application for statistical analysis where users can upload dat
 ## Project Structure
 
 ```
-Stats_React/
+Medstat/
 ├── frontend/              # React + Vite application
 │   ├── src/
 │   │   ├── components/   # React components

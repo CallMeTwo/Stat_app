@@ -37,7 +37,7 @@ class NumpyEncoder(json.JSONEncoder):
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Stats React API",
+    title="Medstat API",
     description="Statistical Analysis API",
     version="0.1.0"
 )
@@ -75,7 +75,7 @@ uploaded_files = {}
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "ok", "service": "Stats React API"}
+    return {"status": "ok", "service": "Medstat API"}
 
 @app.get("/api/sample-data")
 async def list_sample_data():
@@ -982,7 +982,7 @@ async def root():
     else:
         # Fallback to API info if frontend not built
         return {
-            "message": "Stats React API",
+            "message": "Medstat API",
             "endpoints": {
                 "health": "/api/health",
                 "upload": "/api/upload",
