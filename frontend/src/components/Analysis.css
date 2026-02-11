@@ -452,6 +452,59 @@ body.dark-mode .assumption-row.failed .assumption-icon {
   font-family: 'Courier New', monospace;
 }
 
+/* Nested Group Assumptions (for normality per group) */
+.group-assumption-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+.group-assumption-row.passed {
+  border-color: #28a745;
+  background-color: rgba(40, 167, 69, 0.05);
+}
+
+.group-assumption-row.failed {
+  border-color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.05);
+}
+
+body.dark-mode .group-assumption-row.passed {
+  border-color: #90ee90;
+  background-color: rgba(40, 167, 69, 0.15);
+}
+
+body.dark-mode .group-assumption-row.failed {
+  border-color: #ff6b6b;
+  background-color: rgba(220, 53, 69, 0.15);
+}
+
+.group-assumption-row .assumption-icon {
+  font-size: 1rem;
+}
+
+.group-assumption-row.passed .assumption-icon {
+  color: #28a745;
+}
+
+.group-assumption-row.failed .assumption-icon {
+  color: #dc3545;
+}
+
+body.dark-mode .group-assumption-row.passed .assumption-icon {
+  color: #90ee90;
+}
+
+body.dark-mode .group-assumption-row.failed .assumption-icon {
+  color: #ff6b6b;
+}
+
 /* Interpretation Section */
 .interpretation-section {
   margin-top: 25px;

@@ -241,13 +241,38 @@ export default function TestResults({ results, testConfig }) {
         <h4>Assumptions Check</h4>
         <div className="assumptions-table">
           {assumptionEntries.map(([assumptionName, assumptionData]) => (
-            <div key={assumptionName} className={`assumption-row ${assumptionData.passed ? 'passed' : 'failed'}`}>
-              <span className="assumption-icon">{assumptionData.passed ? '✓' : '✗'}</span>
-              <span className="assumption-name">
-                {assumptionName.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                {assumptionData.method && ` (${assumptionData.method})`}
-              </span>
-              <span className="assumption-pvalue">p = {formatValue(assumptionData.p_value, 4)}</span>
+            <div key={assumptionName}>
+              {/* Handle nested groups structure (e.g., normality with per-group p-values) */}
+              {assumptionData.groups ? (
+                <div>
+                  <div className={`assumption-row ${assumptionData.passed ? 'passed' : 'failed'}`}>
+                    <span className="assumption-icon">{assumptionData.passed ? '✓' : '✗'}</span>
+                    <span className="assumption-name">
+                      {assumptionName.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                      {assumptionData.method && ` (${assumptionData.method})`}
+                    </span>
+                  </div>
+                  <div style={{ paddingLeft: '2rem', marginTop: '0.5rem' }}>
+                    {Object.entries(assumptionData.groups).map(([groupName, groupData]) => (
+                      <div key={groupName} className={`group-assumption-row ${groupData.passed ? 'passed' : 'failed'}`}>
+                        <span className="assumption-icon">{groupData.passed ? '✓' : '✗'}</span>
+                        <span className="assumption-name">{groupName}</span>
+                        <span className="assumption-pvalue">p = {formatValue(groupData.p_value, 4)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* Handle flat structure (e.g., homogeneity) */
+                <div className={`assumption-row ${assumptionData.passed ? 'passed' : 'failed'}`}>
+                  <span className="assumption-icon">{assumptionData.passed ? '✓' : '✗'}</span>
+                  <span className="assumption-name">
+                    {assumptionName.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                    {assumptionData.method && ` (${assumptionData.method})`}
+                  </span>
+                  <span className="assumption-pvalue">p = {formatValue(assumptionData.p_value, 4)}</span>
+                </div>
+              )}
             </div>
           ))}
         </div>

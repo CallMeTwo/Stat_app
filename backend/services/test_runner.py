@@ -108,13 +108,22 @@ def run_ttest(data, numeric_var, categorical_var):
             'assumptions': {
                 'normality': {
                     'method': 'Shapiro-Wilk',
-                    'p_value': safe_float(min(p_norm1, p_norm2)),
-                    'passed': safe_float(min(p_norm1, p_norm2)) > 0.05
+                    'groups': {
+                        str(groups[0]): {
+                            'p_value': safe_float(p_norm1),
+                            'passed': bool(safe_float(p_norm1) > 0.05)
+                        },
+                        str(groups[1]): {
+                            'p_value': safe_float(p_norm2),
+                            'passed': bool(safe_float(p_norm2) > 0.05)
+                        }
+                    },
+                    'passed': bool(safe_float(min(p_norm1, p_norm2)) > 0.05)
                 },
                 'homogeneity': {
                     'method': 'Levene',
                     'p_value': safe_float(p_levene),
-                    'passed': safe_float(p_levene) > 0.05
+                    'passed': bool(safe_float(p_levene) > 0.05)
                 }
             },
             'interpretation': 'Significant difference detected (p < 0.05)' if safe_float(p_value) < 0.05 else 'No significant difference (p ≥ 0.05)'
@@ -199,7 +208,7 @@ def run_paired_ttest(data, var1, var2):
                 'normality_of_differences': {
                     'method': 'Shapiro-Wilk',
                     'p_value': safe_float(p_norm),
-                    'passed': safe_float(p_norm) > 0.05
+                    'passed': bool(safe_float(p_norm) > 0.05)
                 }
             },
             'interpretation': 'Significant difference detected (p < 0.05)' if safe_float(p_value) < 0.05 else 'No significant difference (p ≥ 0.05)'
@@ -263,6 +272,27 @@ def run_anova(data, numeric_var, categorical_var):
         # Assumptions tests
         _, p_levene = stats.levene(*group_data)
 
+        # Normality tests for each group (Shapiro-Wilk)
+        normality_groups = {}
+        p_values_normality = []
+        for i, group in enumerate(groups):
+            group_vals = group_data[i]
+            if len(group_vals) > 2:
+                _, p_norm = stats.shapiro(group_vals)
+                p_norm_safe = safe_float(p_norm)
+                normality_groups[str(group)] = {
+                    'p_value': p_norm_safe,
+                    'passed': bool(p_norm_safe > 0.05)
+                }
+                p_values_normality.append(p_norm)
+            else:
+                # Not enough data for Shapiro-Wilk
+                normality_groups[str(group)] = {
+                    'p_value': 0.5,
+                    'passed': True
+                }
+                p_values_normality.append(0.5)
+
         return {
             'test_name': 'ANOVA (One-way)',
             'test_type': 'anova',
@@ -278,10 +308,15 @@ def run_anova(data, numeric_var, categorical_var):
             },
             'groups': groups_stats,
             'assumptions': {
+                'normality': {
+                    'method': 'Shapiro-Wilk',
+                    'groups': normality_groups,
+                    'passed': bool(min(p_values_normality) > 0.05)
+                },
                 'homogeneity': {
                     'method': 'Levene',
                     'p_value': safe_float(p_levene),
-                    'passed': safe_float(p_levene) > 0.05
+                    'passed': bool(safe_float(p_levene) > 0.05)
                 }
             },
             'interpretation': 'Significant difference between groups detected (p < 0.05)' if safe_float(p_value) < 0.05 else 'No significant difference between groups (p ≥ 0.05)'

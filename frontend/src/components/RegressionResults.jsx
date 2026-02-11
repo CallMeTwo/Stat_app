@@ -204,9 +204,23 @@ export default function RegressionResults({
                   {results.assumptions.normality.passed ? '✓' : '✗'}
                 </div>
                 <div className="assumption-content">
-                  <div className="assumption-name">Normality of Residuals (Shapiro-Wilk)</div>
+                  <div className="assumption-name">
+                    {results.assumptions.normality.groups ? 'Normality of Residuals by Group (Shapiro-Wilk)' : 'Normality of Residuals (Shapiro-Wilk)'}
+                  </div>
                   <div className="assumption-details">
-                    p-value: {formatNumber(results.assumptions.normality.p_value)}
+                    {results.assumptions.normality.groups ? (
+                      <div className="group-normality">
+                        {Object.entries(results.assumptions.normality.groups).map(([groupName, groupData]) => (
+                          <div key={groupName} className={`group-detail ${groupData.passed ? 'passed' : 'failed'}`}>
+                            <span className="group-icon">{groupData.passed ? '✓' : '✗'}</span>
+                            <span className="group-name">{groupName}</span>
+                            <span className="group-pvalue">p = {formatNumber(groupData.p_value)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <>p-value: {formatNumber(results.assumptions.normality.p_value)}</>
+                    )}
                   </div>
                 </div>
               </div>
